@@ -1,4 +1,8 @@
 {
-  "login_email": "Email",
-  "login_password": "Mot de passe"
+  "login_email": "Courriel",
+  "login_password": "Mot de passe",
+  "login_forgot_password": "Mot de passe oublié ?",
+  "login_sign_in": "Se connecter",
+  "login_no_account_yet": "Pas encore de compte? ",
+  "login_sign_up_here": "Inscrivez-vous ici"
 }

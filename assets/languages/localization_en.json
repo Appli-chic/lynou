@@ -1,4 +1,8 @@
 {
   "login_email": "Email",
-  "login_password": "Password"
+  "login_password": "Password",
+  "login_forgot_password": "Forgot password ?",
+  "login_sign_in": "Sign in",
+  "login_no_account_yet": "No accout yet? ",
+  "login_sign_up_here": "Sign up here"
 }
