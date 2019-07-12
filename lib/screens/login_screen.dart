@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lynou/components/rounded-text-form.dart';
+import 'package:lynou/components/rounded_text_form.dart';
+import 'package:lynou/localization/app_translations.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -44,14 +45,14 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: <Widget>[
           RoundedTextForm(
-            hint: "Email",
+            hint: AppTranslations.of(context).text("login_email"),
             prefixIconData: Icons.email,
           ),
           const SizedBox(
             height: 20.0,
           ),
           RoundedTextForm(
-            hint: "Password",
+            hint: AppTranslations.of(context).text("login_password"),
             prefixIconData: Icons.lock,
             suffixIconData:
                 _isPasswordHidden ? Icons.visibility_off : Icons.visibility,
