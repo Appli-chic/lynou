@@ -6,6 +6,7 @@ class RoundedTextForm extends StatefulWidget {
     this.prefixIconData,
     this.suffixIconData,
     this.textInputType,
+    this.textController,
     this.obscureText,
     this.onSuffixIconClicked,
   });
@@ -18,11 +19,11 @@ class RoundedTextForm extends StatefulWidget {
   final IconData prefixIconData;
   final IconData suffixIconData;
   final TextInputType textInputType;
+  final TextEditingController textController;
   final Function onSuffixIconClicked;
 }
 
 class _RoundedTextFormState extends State<RoundedTextForm> {
-  TextEditingController _textController = TextEditingController();
   InputBorder _inputBorder = OutlineInputBorder();
 
   @override
@@ -62,15 +63,14 @@ class _RoundedTextFormState extends State<RoundedTextForm> {
 
   @override
   Widget build(BuildContext context) {
-    bool isObscureText = false;
+    bool _isObscureText = false;
 
     if (widget.obscureText != null && widget.obscureText) {
-      isObscureText = true;
+      _isObscureText = true;
     }
 
-    return TextFormField(
-      controller: _textController,
-      // validator: _validateUsername,
+    return TextField(
+      controller: widget.textController,
       decoration: InputDecoration(
         prefixIcon: _displayPrefixIcon(),
         suffixIcon: _displaySuffixIcon(),
@@ -83,7 +83,7 @@ class _RoundedTextFormState extends State<RoundedTextForm> {
         contentPadding: new EdgeInsets.symmetric(vertical: 18.0, horizontal: 0),
       ),
       autocorrect: false,
-      obscureText: isObscureText,
+      obscureText: _isObscureText,
       keyboardType: widget.textInputType == null
           ? TextInputType.text
           : widget.textInputType,

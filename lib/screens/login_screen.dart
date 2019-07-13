@@ -11,9 +11,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  static GlobalKey<FormState> _formKey = new GlobalKey<FormState>();
-
   bool _isPasswordHidden = true;
+
+  TextEditingController _emailController = TextEditingController();
+  TextEditingController _passwordController = TextEditingController();
 
   /// Displays the background image in this page
   Widget _displayBackground() {
@@ -67,47 +68,66 @@ class _LoginScreenState extends State<LoginScreen> {
     return null;
   }
 
+  /// Evaluates if the form values are correct
+  /// If they are, we send the login query to the API
+  /// Otherwise we display the errors
+  _login() {
+    bool _isValid = true;
+
+    if (_validateEmail(_emailController.text) != null) {
+      _isValid = false;
+    }
+
+    if (_validatePassword(_passwordController.text) != null) {
+      _isValid = false;
+    }
+
+    if (_isValid) {
+      print("Valid !!!");
+    }
+  }
+
   /// Displays the form to login
   /// The form contains: Email / Password / Forgot Password / Login button
   Widget _displayForm() {
-    return Form(
-      key: _formKey,
-      child: SizedBox(
-        width: 300,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: <Widget>[
-            RoundedTextForm(
-              hint: AppTranslations.of(context).text("login_email"),
-              prefixIconData: Icons.email,
-              textInputType: TextInputType.emailAddress,
-            ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            RoundedTextForm(
-              hint: AppTranslations.of(context).text("login_password"),
-              prefixIconData: Icons.lock,
-              suffixIconData:
-                  _isPasswordHidden ? Icons.visibility : Icons.visibility_off,
-              obscureText: _isPasswordHidden,
-              onSuffixIconClicked: _onPasswordVisibilityClicked,
-            ),
-            const SizedBox(
-              height: 20.0,
-            ),
-            Text(
-              AppTranslations.of(context).text("login_forgot_password"),
-              style: TextStyle(color: Color.fromARGB(255, 239, 71, 58)),
-            ),
-            const SizedBox(
-              height: 30.0,
-            ),
-            RoundedButton(
-              text: AppTranslations.of(context).text("login_sign_in"),
-            ),
-          ],
-        ),
+    return SizedBox(
+      width: 300,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: <Widget>[
+          RoundedTextForm(
+            textController: _emailController,
+            hint: AppTranslations.of(context).text("login_email"),
+            prefixIconData: Icons.email,
+            textInputType: TextInputType.emailAddress,
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          RoundedTextForm(
+            textController: _passwordController,
+            hint: AppTranslations.of(context).text("login_password"),
+            prefixIconData: Icons.lock,
+            suffixIconData:
+                _isPasswordHidden ? Icons.visibility : Icons.visibility_off,
+            obscureText: _isPasswordHidden,
+            onSuffixIconClicked: _onPasswordVisibilityClicked,
+          ),
+          const SizedBox(
+            height: 20.0,
+          ),
+          Text(
+            AppTranslations.of(context).text("login_forgot_password"),
+            style: TextStyle(color: Color.fromARGB(255, 239, 71, 58)),
+          ),
+          const SizedBox(
+            height: 30.0,
+          ),
+          RoundedButton(
+            text: AppTranslations.of(context).text("login_sign_in"),
+            onClick: _login,
+          ),
+        ],
       ),
     );
   }

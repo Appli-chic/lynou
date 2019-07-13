@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 class RoundedButton extends StatefulWidget {
   RoundedButton({
     this.text,
+    this.onClick,
   });
 
   @override
   _RoundedButtonState createState() => _RoundedButtonState();
 
   final String text;
+  final Function onClick;
 }
 
 class _RoundedButtonState extends State<RoundedButton> {
@@ -18,7 +20,9 @@ class _RoundedButtonState extends State<RoundedButton> {
       height: 48,
       child: FlatButton(
         padding: EdgeInsets.all(0),
-        onPressed: () {},
+        onPressed: () {
+          widget.onClick();
+        },
         child: Container(
           width: double.infinity,
           decoration: const BoxDecoration(
