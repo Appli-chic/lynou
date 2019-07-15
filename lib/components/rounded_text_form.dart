@@ -7,20 +7,26 @@ class RoundedTextForm extends StatefulWidget {
     this.suffixIconData,
     this.textInputType,
     this.textController,
+    this.textInputAction,
     this.obscureText,
+    this.focus,
     this.onSuffixIconClicked,
+    this.onSubmitted,
   });
 
   @override
   _RoundedTextFormState createState() => _RoundedTextFormState();
 
   final bool obscureText;
+  final FocusNode focus;
   final String hint;
   final IconData prefixIconData;
   final IconData suffixIconData;
   final TextInputType textInputType;
   final TextEditingController textController;
+  final TextInputAction textInputAction;
   final Function onSuffixIconClicked;
+  final Function(String) onSubmitted;
 }
 
 class _RoundedTextFormState extends State<RoundedTextForm> {
@@ -70,7 +76,17 @@ class _RoundedTextFormState extends State<RoundedTextForm> {
     }
 
     return TextField(
+      focusNode: widget.focus,
       controller: widget.textController,
+      textInputAction: widget.textInputAction == null
+          ? TextInputAction.next
+          : widget.textInputAction,
+      autocorrect: false,
+      obscureText: _isObscureText,
+      keyboardType: widget.textInputType == null
+          ? TextInputType.text
+          : widget.textInputType,
+      onSubmitted: widget.onSubmitted,
       decoration: InputDecoration(
         prefixIcon: _displayPrefixIcon(),
         suffixIcon: _displaySuffixIcon(),
@@ -80,13 +96,8 @@ class _RoundedTextFormState extends State<RoundedTextForm> {
         focusedBorder: _inputBorder,
         filled: true,
         hintText: widget.hint,
-        contentPadding: new EdgeInsets.symmetric(vertical: 18.0, horizontal: 0),
+        contentPadding: EdgeInsets.symmetric(vertical: 18.0, horizontal: 0),
       ),
-      autocorrect: false,
-      obscureText: _isObscureText,
-      keyboardType: widget.textInputType == null
-          ? TextInputType.text
-          : widget.textInputType,
     );
   }
 }

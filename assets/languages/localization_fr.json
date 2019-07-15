@@ -4,5 +4,7 @@
   "login_forgot_password": "Mot de passe oublié ?",
   "login_sign_in": "Se connecter",
   "login_no_account_yet": "Pas encore de compte? ",
-  "login_sign_up_here": "Inscrivez-vous ici"
+  "login_sign_up_here": "Inscrivez-vous ici",
+  "login_email_not_valid": "Le courriel n'est pas valide.",
+  "login_email_password_too_short": "Le mot de passe doit faire au moins 6 caractères."
 }

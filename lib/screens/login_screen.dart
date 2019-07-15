@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lynou/components/error_form.dart';
 import 'package:validate/validate.dart';
 import 'package:lynou/components/rounded_button.dart';
 import 'package:lynou/components/rounded_text_form.dart';
@@ -11,10 +12,12 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  bool _isPasswordHidden = true;
-
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+
+  bool _isPasswordHidden = true;
+  final _passwordFocus = FocusNode();
+  List<String> _errorList = [];
 
   /// Displays the background image in this page
   Widget _displayBackground() {
@@ -72,19 +75,35 @@ class _LoginScreenState extends State<LoginScreen> {
   /// If they are, we send the login query to the API
   /// Otherwise we display the errors
   _login() {
-    bool _isValid = true;
+    bool isValid = true;
+    List<String> errorList = [];
 
     if (_validateEmail(_emailController.text) != null) {
-      _isValid = false;
+      isValid = false;
+      errorList.add(AppTranslations.of(context).text("login_email_not_valid"));
     }
 
     if (_validatePassword(_passwordController.text) != null) {
-      _isValid = false;
+      isValid = false;
+      errorList.add(
+          AppTranslations.of(context).text("login_email_password_too_short"));
     }
 
-    if (_isValid) {
+    if (isValid) {
       print("Valid !!!");
+    } else {
+      setState(() {
+        _errorList = errorList;
+      });
     }
+
+    // Hide the keyboard
+    FocusScope.of(context).requestFocus(FocusNode());
+  }
+
+  /// When the email is submitted we focus the password field
+  _onEmailSubmitted(String text) {
+    FocusScope.of(context).requestFocus(_passwordFocus);
   }
 
   /// Displays the form to login
@@ -100,11 +119,13 @@ class _LoginScreenState extends State<LoginScreen> {
             hint: AppTranslations.of(context).text("login_email"),
             prefixIconData: Icons.email,
             textInputType: TextInputType.emailAddress,
+            onSubmitted: _onEmailSubmitted,
           ),
           const SizedBox(
             height: 20.0,
           ),
           RoundedTextForm(
+            focus: _passwordFocus,
             textController: _passwordController,
             hint: AppTranslations.of(context).text("login_password"),
             prefixIconData: Icons.lock,
@@ -112,6 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 _isPasswordHidden ? Icons.visibility : Icons.visibility_off,
             obscureText: _isPasswordHidden,
             onSuffixIconClicked: _onPasswordVisibilityClicked,
+            textInputAction: TextInputAction.done,
           ),
           const SizedBox(
             height: 20.0,
@@ -130,6 +152,17 @@ class _LoginScreenState extends State<LoginScreen> {
         ],
       ),
     );
+  }
+
+  Widget _displayError() {
+    if (_errorList.isNotEmpty) {
+      return SizedBox(
+        width: 300,
+        child: ErrorForm(errorList: _errorList),
+      );
+    } else {
+      return Container();
+    }
   }
 
   /// Displays the footer which contains a label redirecting to the sign up page
@@ -161,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
       body: GestureDetector(
         onTap: () {
           // Hides the keyboard when we click outside of the textfields
-          FocusScope.of(context).requestFocus(new FocusNode());
+          FocusScope.of(context).requestFocus(FocusNode());
         },
         child: Stack(
           children: <Widget>[
@@ -171,6 +204,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: <Widget>[
                 _displayLogo(),
                 _displayForm(),
+                _displayError(),
                 _displayFooter(),
               ],
             ),
