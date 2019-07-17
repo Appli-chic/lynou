@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/localization/application.dart';
+import 'package:lynou/models/env.dart';
 import 'package:lynou/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:lynou/services/auth_service.dart';
-import 'package:lynou/utils/env.dart';
 import 'package:provider/provider.dart';
 
 void main() {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/components/error_form.dart';
+import 'package:lynou/models/api_error.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:validate/validate.dart';
@@ -66,23 +67,40 @@ class _LoginScreenState extends State<LoginScreen> {
   /// Evaluates if the form values are correct
   /// If they are, we send the login query to the API
   /// Otherwise we display the errors
-  _login() {
+  _login() async {
     bool isValid = true;
     List<String> errorList = [];
 
+    // Check the email
     if (_validateEmail(_emailController.text) != null) {
       isValid = false;
       errorList.add(AppTranslations.of(context).text("login_email_not_valid"));
     }
 
+    // Check the password
     if (_validatePassword(_passwordController.text) != null) {
       isValid = false;
       errorList.add(
           AppTranslations.of(context).text("login_email_password_too_short"));
     }
 
-    if (isValid) {}
-    _authService.login(_emailController.text, _passwordController.text);
+    if (isValid) {
+      // Login to the server
+      try {
+        await _authService.login(
+            _emailController.text, _passwordController.text);
+      } catch (e) {
+        if (e is ApiError) {
+          if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
+            errorList.add(AppTranslations.of(context)
+                .text("login_error_email_password_not_matching"));
+          }
+        } else {
+          errorList.add(AppTranslations.of(context).text("error_server"));
+        }
+      }
+    }
+
     setState(() {
       _errorList = errorList;
     });

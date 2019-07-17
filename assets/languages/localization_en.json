@@ -6,5 +6,7 @@
   "login_no_account_yet": "No accout yet? ",
   "login_sign_up_here": "Sign up here",
   "login_email_not_valid": "Email is not valid.",
-  "login_email_password_too_short": "The password must be at least 6 characters."
+  "login_email_password_too_short": "The password must be at least 6 characters.",
+  "login_error_email_password_not_matching": "Email or password incorrect.",
+  "error_server": "Impossible to reach the server."
 }
