@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class ErrorForm extends StatelessWidget {
-  ErrorForm({this.errorList});
-
   final List<String> errorList;
+
+  ErrorForm({this.errorList});
 
   @override
   Widget build(BuildContext context) {

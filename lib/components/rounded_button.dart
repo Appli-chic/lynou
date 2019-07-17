@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 
 class RoundedButton extends StatefulWidget {
+  final String text;
+  final Function onClick;
+
   RoundedButton({
     this.text,
     this.onClick,
@@ -8,9 +11,6 @@ class RoundedButton extends StatefulWidget {
 
   @override
   _RoundedButtonState createState() => _RoundedButtonState();
-
-  final String text;
-  final Function onClick;
 }
 
 class _RoundedButtonState extends State<RoundedButton> {

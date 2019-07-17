@@ -1,6 +1,17 @@
 import 'package:flutter/material.dart';
 
 class RoundedTextForm extends StatefulWidget {
+  final bool obscureText;
+  final FocusNode focus;
+  final String hint;
+  final IconData prefixIconData;
+  final IconData suffixIconData;
+  final TextInputType textInputType;
+  final TextEditingController textController;
+  final TextInputAction textInputAction;
+  final Function onSuffixIconClicked;
+  final Function(String) onSubmitted;
+
   RoundedTextForm({
     @required this.hint,
     this.prefixIconData,
@@ -16,17 +27,6 @@ class RoundedTextForm extends StatefulWidget {
 
   @override
   _RoundedTextFormState createState() => _RoundedTextFormState();
-
-  final bool obscureText;
-  final FocusNode focus;
-  final String hint;
-  final IconData prefixIconData;
-  final IconData suffixIconData;
-  final TextInputType textInputType;
-  final TextEditingController textController;
-  final TextInputAction textInputAction;
-  final Function onSuffixIconClicked;
-  final Function(String) onSubmitted;
 }
 
 class _RoundedTextFormState extends State<RoundedTextForm> {

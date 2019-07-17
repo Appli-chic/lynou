@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/components/error_form.dart';
+import 'package:lynou/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'package:validate/validate.dart';
 import 'package:lynou/components/rounded_button.dart';
 import 'package:lynou/components/rounded_text_form.dart';
@@ -19,17 +21,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordFocus = FocusNode();
   List<String> _errorList = [];
 
-  /// Displays the background image in this page
-  Widget _displayBackground() {
-    return Container(
-      decoration: BoxDecoration(
-        image: DecorationImage(
-          image: AssetImage('assets/login-background.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-    );
-  }
+  AuthService _authService;
 
   /// Displays Lynou's logo in the top of this page
   Widget _displayLogo() {
@@ -89,13 +81,11 @@ class _LoginScreenState extends State<LoginScreen> {
           AppTranslations.of(context).text("login_email_password_too_short"));
     }
 
-    if (isValid) {
-      print("Valid !!!");
-    } else {
-      setState(() {
-        _errorList = errorList;
-      });
-    }
+    if (isValid) {}
+    _authService.login(_emailController.text, _passwordController.text);
+    setState(() {
+      _errorList = errorList;
+    });
 
     // Hide the keyboard
     FocusScope.of(context).requestFocus(FocusNode());
@@ -190,25 +180,38 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
+    _authService = Provider.of<AuthService>(context);
+    final size = MediaQuery.of(context).size;
+
     return Scaffold(
-      body: GestureDetector(
-        onTap: () {
-          // Hides the keyboard when we click outside of the textfields
-          FocusScope.of(context).requestFocus(FocusNode());
-        },
-        child: Stack(
-          children: <Widget>[
-            _displayBackground(),
-            Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: <Widget>[
-                _displayLogo(),
-                _displayForm(),
-                _displayError(),
-                _displayFooter(),
-              ],
+      body: SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: size.height,
+          ),
+          child: GestureDetector(
+            onTap: () {
+              // Hides the keyboard when we click outside of the textfields
+              FocusScope.of(context).requestFocus(FocusNode());
+            },
+            child: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage('assets/login-background.png'),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  _displayLogo(),
+                  _displayForm(),
+                  _displayError(),
+                  _displayFooter(),
+                ],
+              ),
             ),
-          ],
+          ),
         ),
       ),
     );
