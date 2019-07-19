@@ -8,5 +8,9 @@
   "login_email_not_valid": "Email is not valid.",
   "login_email_password_too_short": "The password must be at least 6 characters.",
   "login_error_email_password_not_matching": "Email or password incorrect.",
-  "error_server": "Impossible to reach the server."
+  "error_server": "Impossible to reach the server.",
+  "choose_theme_select": "Select your theme",
+  "choose_theme_dark": "Dark",
+  "choose_theme_light": "Light",
+  "next": "Next"
 }

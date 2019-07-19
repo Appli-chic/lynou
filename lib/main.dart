@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/localization/application.dart';
 import 'package:lynou/models/env.dart';
+import 'package:lynou/screens/choose_theme_screen.dart';
 import 'package:lynou/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:lynou/screens/signup_screen.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
@@ -42,6 +45,10 @@ class _AppState extends State<App> {
 
   @override
   Widget build(BuildContext context) {
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+
     return MultiProvider(
       providers: [
         Provider<AuthService>.value(
@@ -64,6 +71,8 @@ class _AppState extends State<App> {
         initialRoute: '/',
         routes: {
           '/login': (context) => LoginScreen(),
+          '/signup': (context) => SignUpScreen(),
+          '/choose-theme': (context) => ChooseThemeScreen(),
           '/': (context) => LoginScreen(),
         },
       ),

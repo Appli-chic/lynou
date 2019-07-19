@@ -55,14 +55,14 @@ class ErrorForm extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16),
-      decoration: new BoxDecoration(
-        gradient: new LinearGradient(
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
           colors: [
             Color(0xFFCB2D3E),
             Color(0xFFEF473A),
           ],
         ),
-        borderRadius: new BorderRadius.all(
+        borderRadius: BorderRadius.all(
           const Radius.circular(8.0),
         ),
       ),

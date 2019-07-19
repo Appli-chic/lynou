@@ -8,5 +8,9 @@
   "login_email_not_valid": "Le courriel n'est pas valide.",
   "login_email_password_too_short": "Le mot de passe doit faire au moins 6 caractères.",
   "login_error_email_password_not_matching": "Courriel ou mot de passe incorrecte.",
-  "error_server": "Impossible de se connecter au serveur."
+  "error_server": "Impossible de se connecter au serveur.",
+  "choose_theme_select": "Choisissez votre thème",
+  "choose_theme_dark": "Sombre",
+  "choose_theme_light": "Clair",
+  "next": "Suivant"
 }

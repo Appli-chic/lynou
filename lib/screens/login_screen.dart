@@ -89,6 +89,9 @@ class _LoginScreenState extends State<LoginScreen> {
       try {
         await _authService.login(
             _emailController.text, _passwordController.text);
+
+        Navigator.pop(context);
+        Navigator.pushReplacementNamed(context, '/');
       } catch (e) {
         if (e is ApiError) {
           if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
@@ -177,18 +180,23 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _displayFooter() {
     return Container(
       margin: EdgeInsets.only(bottom: 20),
-      child: RichText(
-        text: TextSpan(
-          children: [
-            TextSpan(
-              text: AppTranslations.of(context).text("login_no_account_yet"),
-              style: TextStyle(color: Colors.white),
-            ),
-            TextSpan(
-              text: AppTranslations.of(context).text("login_sign_up_here"),
-              style: TextStyle(color: Color(0xFFEF473A)),
-            ),
-          ],
+      child: GestureDetector(
+        onTap: () {
+          Navigator.pushNamed(context, '/signup');
+        },
+        child: RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: AppTranslations.of(context).text("login_no_account_yet"),
+                style: TextStyle(color: Colors.white),
+              ),
+              TextSpan(
+                text: AppTranslations.of(context).text("login_sign_up_here"),
+                style: TextStyle(color: Color(0xFFEF473A)),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -206,6 +214,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: ConstrainedBox(
           constraints: BoxConstraints(
             minHeight: size.height,
+            minWidth: size.width,
           ),
           child: GestureDetector(
             onTap: () {
