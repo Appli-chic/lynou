@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lynou/utils/constants.dart';
 
 class RoundedButton extends StatefulWidget {
   final String text;
@@ -28,8 +29,8 @@ class _RoundedButtonState extends State<RoundedButton> {
           decoration: const BoxDecoration(
             gradient: LinearGradient(
               colors: <Color>[
-                Color(0xFFCB2D3E),
-                Color(0xFFEF473A),
+                RED_FIRST_COLOR,
+                RED_SECOND_COLOR,
               ],
             ),
             borderRadius: const BorderRadius.all(Radius.circular(28)),

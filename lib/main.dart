@@ -6,7 +6,9 @@ import 'package:lynou/models/env.dart';
 import 'package:lynou/screens/choose_theme_screen.dart';
 import 'package:lynou/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:lynou/screens/main_screen.dart';
 import 'package:lynou/screens/signup_screen.dart';
+import 'package:lynou/screens/splash_screen.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:provider/provider.dart';
 
@@ -73,7 +75,8 @@ class _AppState extends State<App> {
           '/login': (context) => LoginScreen(),
           '/signup': (context) => SignUpScreen(),
           '/choose-theme': (context) => ChooseThemeScreen(),
-          '/': (context) => LoginScreen(),
+          '/': (context) => SplashScreen(),
+          '/main': (context) => MainScreen(),
         },
       ),
     );

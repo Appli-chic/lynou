@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lynou/components/rounded_button.dart';
 import 'package:lynou/localization/app_translations.dart';
+import 'package:lynou/utils/constants.dart';
 
 enum ThemeEnum { dark, light }
 
@@ -75,6 +77,14 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
     );
   }
 
+  _onNextButtonClicked() async {
+    final storage = new FlutterSecureStorage();
+    await storage.write(key: KEY_THEME, value: _themeEnum.index.toString());
+
+    Navigator.pop(context);
+    Navigator.pushReplacementNamed(context, '/main');
+  }
+
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
@@ -83,7 +93,7 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
       body: Theme(
         data: ThemeData.dark(),
         child: Container(
-          color: Color.fromARGB(240, 33, 38, 50),
+          color: BACKGROUND_COLOR,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: <Widget>[
@@ -107,6 +117,7 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
                 width: 150,
                 child: RoundedButton(
                   text: AppTranslations.of(context).text("next"),
+                  onClick: _onNextButtonClicked,
                 ),
               ),
             ],

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/components/error_form.dart';
+import 'package:lynou/components/loading_dialog.dart';
 import 'package:lynou/models/api_error.dart';
 import 'package:lynou/services/auth_service.dart';
+import 'package:lynou/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:validate/validate.dart';
 import 'package:lynou/components/rounded_button.dart';
@@ -17,6 +19,7 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   TextEditingController _emailController = TextEditingController();
   TextEditingController _passwordController = TextEditingController();
+  bool _isLoading = false;
 
   bool _isPasswordHidden = true;
   final _passwordFocus = FocusNode();
@@ -68,48 +71,65 @@ class _LoginScreenState extends State<LoginScreen> {
   /// If they are, we send the login query to the API
   /// Otherwise we display the errors
   _login() async {
-    bool isValid = true;
-    List<String> errorList = [];
+    if (!_isLoading) {
+      setState(() {
+        _isLoading = true;
+      });
 
-    // Check the email
-    if (_validateEmail(_emailController.text) != null) {
-      isValid = false;
-      errorList.add(AppTranslations.of(context).text("login_email_not_valid"));
-    }
+      bool isValid = true;
+      List<String> errorList = [];
 
-    // Check the password
-    if (_validatePassword(_passwordController.text) != null) {
-      isValid = false;
-      errorList.add(
-          AppTranslations.of(context).text("login_email_password_too_short"));
-    }
+      // Check the email
+      if (_validateEmail(_emailController.text) != null) {
+        isValid = false;
+        errorList
+            .add(AppTranslations.of(context).text("login_email_not_valid"));
+      }
 
-    if (isValid) {
-      // Login to the server
-      try {
-        await _authService.login(
-            _emailController.text, _passwordController.text);
+      // Check the password
+      if (_validatePassword(_passwordController.text) != null) {
+        isValid = false;
+        errorList.add(
+            AppTranslations.of(context).text("login_email_password_too_short"));
+      }
 
-        Navigator.pop(context);
-        Navigator.pushReplacementNamed(context, '/');
-      } catch (e) {
-        if (e is ApiError) {
-          if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
-            errorList.add(AppTranslations.of(context)
-                .text("login_error_email_password_not_matching"));
+      if (isValid) {
+        // Login to the server
+        try {
+          await _authService.login(
+              _emailController.text, _passwordController.text);
+
+          setState(() {
+            _isLoading = false;
+          });
+
+          Navigator.pop(context);
+          Navigator.pushReplacementNamed(context, '/main');
+        } catch (e) {
+          setState(() {
+            _isLoading = false;
+          });
+
+          if (e is ApiError) {
+            if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
+              errorList.add(AppTranslations.of(context)
+                  .text("login_error_email_password_not_matching"));
+            } else {
+              errorList.add(AppTranslations.of(context).text("error_server"));
+            }
+          } else {
+            errorList.add(AppTranslations.of(context).text("error_server"));
           }
-        } else {
-          errorList.add(AppTranslations.of(context).text("error_server"));
         }
       }
+
+      setState(() {
+        _errorList = errorList;
+      });
+
+      // Hide the keyboard
+      FocusScope.of(context).requestFocus(FocusNode());
     }
-
-    setState(() {
-      _errorList = errorList;
-    });
-
-    // Hide the keyboard
-    FocusScope.of(context).requestFocus(FocusNode());
   }
 
   /// When the email is submitted we focus the password field
@@ -146,13 +166,13 @@ class _LoginScreenState extends State<LoginScreen> {
             onSuffixIconClicked: _onPasswordVisibilityClicked,
             textInputAction: TextInputAction.done,
           ),
-          const SizedBox(
-            height: 20.0,
-          ),
-          Text(
-            AppTranslations.of(context).text("login_forgot_password"),
-            style: TextStyle(color: Color.fromARGB(255, 239, 71, 58)),
-          ),
+          // const SizedBox(
+          //   height: 20.0,
+          // ),
+          // Text(
+          //   AppTranslations.of(context).text("login_forgot_password"),
+          //   style: TextStyle(color: RED_SECOND_COLOR),
+          // ),
           const SizedBox(
             height: 30.0,
           ),
@@ -193,7 +213,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               TextSpan(
                 text: AppTranslations.of(context).text("login_sign_up_here"),
-                style: TextStyle(color: Color(0xFFEF473A)),
+                style: TextStyle(color: RED_SECOND_COLOR),
               ),
             ],
           ),
@@ -210,32 +230,35 @@ class _LoginScreenState extends State<LoginScreen> {
     final size = MediaQuery.of(context).size;
 
     return Scaffold(
-      body: SingleChildScrollView(
-        child: ConstrainedBox(
-          constraints: BoxConstraints(
-            minHeight: size.height,
-            minWidth: size.width,
-          ),
-          child: GestureDetector(
-            onTap: () {
-              // Hides the keyboard when we click outside of the textfields
-              FocusScope.of(context).requestFocus(FocusNode());
-            },
-            child: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/login-background.png'),
-                  fit: BoxFit.cover,
+      body: LoadingDialog(
+        isDisplayed: _isLoading,
+        child: SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(
+              minHeight: size.height,
+              minWidth: size.width,
+            ),
+            child: GestureDetector(
+              onTap: () {
+                // Hides the keyboard when we click outside of the textfields
+                FocusScope.of(context).requestFocus(FocusNode());
+              },
+              child: Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/login-background.png'),
+                    fit: BoxFit.cover,
+                  ),
                 ),
-              ),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  _displayLogo(),
-                  _displayForm(),
-                  _displayError(),
-                  _displayFooter(),
-                ],
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    _displayLogo(),
+                    _displayForm(),
+                    _displayError(),
+                    _displayFooter(),
+                  ],
+                ),
               ),
             ),
           ),
