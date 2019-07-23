@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:lynou/utils/constants.dart';
+import 'package:lynou/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
   @override
@@ -7,58 +8,69 @@ class MainScreen extends StatefulWidget {
 }
 
 class _MainScreenState extends State<MainScreen> {
+  ThemeProvider _themeProvider;
+
   @override
   Widget build(BuildContext context) {
+    _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Lynou'),
-        backgroundColor: BACKGROUND_COLOR,
+        backgroundColor: _themeProvider.getBackgroundColor,
         elevation: 0,
       ),
       body: Container(
-        color: BACKGROUND_COLOR,
+        color: _themeProvider.getBackgroundColor,
       ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
-        backgroundColor: BACKGROUND_COLOR,
+        backgroundColor: _themeProvider.getBackgroundColor,
         elevation: 0,
         items: <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.white),
+            icon: Icon(Icons.home, color: _themeProvider.getTextColor),
             activeIcon: ShaderMask(
               shaderCallback: (Rect rect) {
                 return LinearGradient(
                   colors: <Color>[
-                    RED_FIRST_COLOR,
-                    RED_SECOND_COLOR,
+                    _themeProvider.getFirstColor,
+                    _themeProvider.getSecondColor,
                   ],
                 ).createShader(rect);
               },
               child: Icon(Icons.home),
             ),
-            title: SizedBox.shrink(),
+            title: const SizedBox(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.chat_bubble, color: Colors.white),
+            icon: Icon(Icons.chat_bubble, color: _themeProvider.getTextColor),
             activeIcon: Icon(Icons.chat_bubble),
-            title: SizedBox.shrink(),
+            title: const SizedBox(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.folder, color: Colors.white),
+            icon: Icon(Icons.folder, color: _themeProvider.getTextColor),
             activeIcon: Icon(Icons.folder),
-            title: SizedBox.shrink(),
+            title: const SizedBox(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.search, color: Colors.white),
+            icon: Icon(Icons.search, color: _themeProvider.getTextColor),
             activeIcon: Icon(Icons.search),
-            title: SizedBox.shrink(),
+            title: const SizedBox(),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.white),
+            icon: Icon(Icons.person, color: _themeProvider.getTextColor),
             activeIcon: Icon(Icons.person),
-            title: SizedBox.shrink(),
+            title: const SizedBox(),
           ),
         ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          _themeProvider.setTheme(1);
+        },
+        child: Icon(Icons.plus_one),
+        backgroundColor: Colors.red,
       ),
     );
   }

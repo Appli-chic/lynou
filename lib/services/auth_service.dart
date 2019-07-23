@@ -28,25 +28,26 @@ class AuthService {
   ///
   /// Throws [ApiError] if the [email] or [password] is wrong.
   Future<void> login(String email, String password) async {
-    var client = new http.Client();
-    var response = await client.post("${env.apiUrl}$AUTH_LOGIN", body: {
+    var _client = new http.Client();
+    var _response = await _client.post("${env.apiUrl}$AUTH_LOGIN", body: {
       "email": email,
       "password": password,
       "deviceId": env.deviceId.toString()
     });
 
-    if (response.statusCode == 200) {
+    if (_response.statusCode == 200) {
       // Retrieve the tokens
-      final storage = new FlutterSecureStorage();
-      Token token = Token.fromJson(json.decode(response.body));
+      final _storage = new FlutterSecureStorage();
+      Token _token = Token.fromJson(json.decode(_response.body));
 
       // Store the tokens
-      await storage.write(key: env.accessTokenKey, value: token.accessToken);
-      await storage.write(key: env.refreshTokenKey, value: token.refreshToken);
-      await storage.write(
-          key: env.expiresInKey, value: token.expiresIn.toString());
+      await _storage.write(key: env.accessTokenKey, value: _token.accessToken);
+      await _storage.write(
+          key: env.refreshTokenKey, value: _token.refreshToken);
+      await _storage.write(
+          key: env.expiresInKey, value: _token.expiresIn.toString());
     } else {
-      throw ApiError.fromJson(json.decode(response.body));
+      throw ApiError.fromJson(json.decode(_response.body));
     }
   }
 
@@ -57,8 +58,8 @@ class AuthService {
   /// Throws [ApiError] if the [email] already exists.
   Future<void> signUp(
       String email, String name, String password, String verifyPassword) async {
-    var client = new http.Client();
-    var response = await client.post("${env.apiUrl}$AUTH_SIGNUP", body: {
+    var _client = new http.Client();
+    var _response = await _client.post("${env.apiUrl}$AUTH_SIGNUP", body: {
       "email": email,
       "name": name,
       "password": password,
@@ -66,27 +67,28 @@ class AuthService {
       "deviceId": env.deviceId.toString()
     });
 
-    if (response.statusCode == 201) {
+    if (_response.statusCode == 201) {
       // Retrieve the tokens
-      final storage = new FlutterSecureStorage();
-      Token token = Token.fromJson(json.decode(response.body));
+      final _storage = new FlutterSecureStorage();
+      Token _token = Token.fromJson(json.decode(_response.body));
 
       // Store the tokens
-      await storage.write(key: env.accessTokenKey, value: token.accessToken);
-      await storage.write(key: env.refreshTokenKey, value: token.refreshToken);
-      await storage.write(
-          key: env.expiresInKey, value: token.expiresIn.toString());
+      await _storage.write(key: env.accessTokenKey, value: _token.accessToken);
+      await _storage.write(
+          key: env.refreshTokenKey, value: _token.refreshToken);
+      await _storage.write(
+          key: env.expiresInKey, value: _token.expiresIn.toString());
     } else {
-      throw ApiError.fromJson(json.decode(response.body));
+      throw ApiError.fromJson(json.decode(_response.body));
     }
   }
 
   /// Check if the user is logged in by checking if it has an access token
   Future<bool> isLoggedIn() async {
-    final storage = new FlutterSecureStorage();
-    final accessToken = await storage.read(key: env.accessTokenKey);
+    final _storage = new FlutterSecureStorage();
+    final _accessToken = await _storage.read(key: env.accessTokenKey);
 
-    if (accessToken != null && env.accessTokenKey.isNotEmpty) {
+    if (_accessToken != null && env.accessTokenKey.isNotEmpty) {
       return true;
     } else {
       return false;

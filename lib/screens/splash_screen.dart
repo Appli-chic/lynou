@@ -16,9 +16,9 @@ class _SplashScreenState extends State<SplashScreen> {
   /// The home page if the user is logged in
   /// The login page if the user needs to login
   _checkIsLoggedIn() async {
-    bool isLoggedIn = await _authService.isLoggedIn();
+    bool _isLoggedIn = await _authService.isLoggedIn();
 
-    if (isLoggedIn) {
+    if (_isLoggedIn) {
       Navigator.pushReplacementNamed(context, '/main');
     } else {
       Navigator.pushReplacementNamed(context, '/login');

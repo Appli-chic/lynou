@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/localization/application.dart';
 import 'package:lynou/models/env.dart';
+import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/choose_theme_screen.dart';
 import 'package:lynou/screens/login_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -34,11 +35,13 @@ class _AppState extends State<App> {
     _onLoadEnvFile();
   }
 
+  /// Load the env file which contains critic data
   void _onLoadEnvFile() async {
     _env = await EnvParser().load();
     setState(() {});
   }
 
+  /// Triggers when the [locale] changes
   void onLocaleChange(Locale locale) {
     setState(() {
       _newLocaleDelegate = AppTranslationsDelegate(newLocale: locale);
@@ -55,6 +58,9 @@ class _AppState extends State<App> {
       providers: [
         Provider<AuthService>.value(
           value: AuthService(env: _env),
+        ),
+        ChangeNotifierProvider<ThemeProvider>.value(
+          value: ThemeProvider(),
         ),
       ],
       child: MaterialApp(

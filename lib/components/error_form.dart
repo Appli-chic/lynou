@@ -8,7 +8,7 @@ class ErrorForm extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     List<Widget> _displayErrors() {
-      List<Widget> result = [];
+      List<Widget> _result = [];
 
       errorList.asMap().forEach((index, error) {
         Widget textWidget = Row(
@@ -38,9 +38,9 @@ class ErrorForm extends StatelessWidget {
 
         // Add padding if it's not the first item
         if (index == 0) {
-          result.add(textWidget);
+          _result.add(textWidget);
         } else {
-          result.add(
+          _result.add(
             Padding(
               padding: const EdgeInsets.only(top: 8),
               child: textWidget,
@@ -49,7 +49,7 @@ class ErrorForm extends StatelessWidget {
         }
       });
 
-      return result;
+      return _result;
     }
 
     return Container(

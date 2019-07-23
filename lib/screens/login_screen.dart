@@ -76,24 +76,24 @@ class _LoginScreenState extends State<LoginScreen> {
         _isLoading = true;
       });
 
-      bool isValid = true;
-      List<String> errorList = [];
+      bool _isValid = true;
+      List<String> _errorList = [];
 
       // Check the email
       if (_validateEmail(_emailController.text) != null) {
-        isValid = false;
-        errorList
+        _isValid = false;
+        _errorList
             .add(AppTranslations.of(context).text("login_email_not_valid"));
       }
 
       // Check the password
       if (_validatePassword(_passwordController.text) != null) {
-        isValid = false;
-        errorList.add(
+        _isValid = false;
+        _errorList.add(
             AppTranslations.of(context).text("login_email_password_too_short"));
       }
 
-      if (isValid) {
+      if (_isValid) {
         // Login to the server
         try {
           await _authService.login(
@@ -112,19 +112,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
           if (e is ApiError) {
             if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
-              errorList.add(AppTranslations.of(context)
+              _errorList.add(AppTranslations.of(context)
                   .text("login_error_email_password_not_matching"));
             } else {
-              errorList.add(AppTranslations.of(context).text("error_server"));
+              _errorList.add(AppTranslations.of(context).text("error_server"));
             }
           } else {
-            errorList.add(AppTranslations.of(context).text("error_server"));
+            _errorList.add(AppTranslations.of(context).text("error_server"));
           }
         }
       }
 
       setState(() {
-        _errorList = errorList;
+        _errorList = _errorList;
       });
 
       // Hide the keyboard
@@ -185,6 +185,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// Displays the errors from the [_errorList]
   Widget _displayError() {
     if (_errorList.isNotEmpty) {
       return SizedBox(
@@ -227,7 +228,7 @@ class _LoginScreenState extends State<LoginScreen> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
     _authService = Provider.of<AuthService>(context);
-    final size = MediaQuery.of(context).size;
+    final _size = MediaQuery.of(context).size;
 
     return Scaffold(
       body: LoadingDialog(
@@ -235,8 +236,8 @@ class _LoginScreenState extends State<LoginScreen> {
         child: SingleChildScrollView(
           child: ConstrainedBox(
             constraints: BoxConstraints(
-              minHeight: size.height,
-              minWidth: size.width,
+              minHeight: _size.height,
+              minWidth: _size.width,
             ),
             child: GestureDetector(
               onTap: () {

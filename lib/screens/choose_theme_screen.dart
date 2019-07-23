@@ -29,7 +29,7 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
   }
 
   Widget _displayTheme(String imagePath, String title, ThemeEnum theme) {
-    final size = MediaQuery.of(context).size;
+    final _size = MediaQuery.of(context).size;
 
     return GestureDetector(
       onTap: () {
@@ -47,8 +47,8 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
             ),
           ),
           SizedBox(
-            width: size.width / 2.4,
-            height: size.height / 2,
+            width: _size.width / 2.4,
+            height: _size.height / 2,
             child: DecoratedBox(
               decoration: BoxDecoration(
                 shape: BoxShape.rectangle,
@@ -78,8 +78,8 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
   }
 
   _onNextButtonClicked() async {
-    final storage = new FlutterSecureStorage();
-    await storage.write(key: KEY_THEME, value: _themeEnum.index.toString());
+    final _storage = new FlutterSecureStorage();
+    await _storage.write(key: KEY_THEME, value: _themeEnum.index.toString());
 
     Navigator.pop(context);
     Navigator.pushReplacementNamed(context, '/main');
