@@ -6,6 +6,7 @@ class LynouTheme {
   final Color firstColor;
   final Color secondColor;
   final Color textColor;
+  final bool isLight;
 
   LynouTheme({
     @required this.id,
@@ -13,5 +14,6 @@ class LynouTheme {
     @required this.firstColor,
     @required this.secondColor,
     @required this.textColor,
+    @required this.isLight,
   });
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lynou/models/lynou_theme.dart';
 import 'package:lynou/utils/constants.dart';
@@ -23,6 +24,7 @@ class ThemeProvider with ChangeNotifier {
       firstColor: Color(0xFFCB2D3E),
       secondColor: Color(0xFFEF473A),
       textColor: Color(0xFFFFFFFF),
+      isLight: false,
     );
 
     LynouTheme _defaultLightTheme = LynouTheme(
@@ -31,6 +33,7 @@ class ThemeProvider with ChangeNotifier {
       firstColor: Color(0xFFCB2D3E),
       secondColor: Color(0xFFEF473A),
       textColor: Color(0xFF464646),
+      isLight: true,
     );
 
     _themeList.add(_defaultDarkTheme);
@@ -61,18 +64,27 @@ class ThemeProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Retrieve the background color corresponding to the [_theme]
-  LynouTheme get getTheme => _theme;
+  /// Set the brightness from the actual [_theme]
+  Brightness setBrightness() {
+    if (theme.isLight) {
+      return Brightness.light;
+    } else {
+      return Brightness.dark;
+    }
+  }
 
   /// Retrieve the background color corresponding to the [_theme]
-  Color get getBackgroundColor => _theme.backgroundColor;
+  LynouTheme get theme => _theme;
+
+  /// Retrieve the background color corresponding to the [_theme]
+  Color get backgroundColor => _theme.backgroundColor;
 
   /// Retrieve the first color corresponding to the [_theme]
-  Color get getFirstColor => _theme.firstColor;
+  Color get firstColor => _theme.firstColor;
 
   /// Retrieve the second color corresponding to the [_theme]
-  Color get getSecondColor => _theme.secondColor;
+  Color get secondColor => _theme.secondColor;
 
   /// Retrieve the text color corresponding to the [_theme]
-  Color get getTextColor => _theme.textColor;
+  Color get textColor => _theme.textColor;
 }
