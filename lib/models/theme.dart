@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class LynouTheme {
+class LYTheme {
   final int id;
   final Color backgroundColor;
   final Color firstColor;
@@ -8,7 +8,7 @@ class LynouTheme {
   final Color textColor;
   final bool isLight;
 
-  LynouTheme({
+  LYTheme({
     @required this.id,
     @required this.backgroundColor,
     @required this.firstColor,

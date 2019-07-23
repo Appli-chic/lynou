@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:lynou/components/rounded_button.dart';
+import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/utils/constants.dart';
 

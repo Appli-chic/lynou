@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:lynou/components/error_form.dart';
-import 'package:lynou/components/loading_dialog.dart';
-import 'package:lynou/components/rounded_button.dart';
-import 'package:lynou/components/rounded_text_form.dart';
+import 'package:lynou/components/forms/error_form.dart';
+import 'package:lynou/components/forms/loading_dialog.dart';
+import 'package:lynou/components/forms/rounded_button.dart';
+import 'package:lynou/components/forms/rounded_text_form.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/models/api_error.dart';
 import 'package:lynou/services/auth_service.dart';

@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'package:lynou/models/lynou_theme.dart';
+import 'package:lynou/models/theme.dart';
 import 'package:lynou/utils/constants.dart';
 
 const int DEFAULT_THEME_DARK = 0;
 const int DEFAULT_THEME_LIGHT = 1;
 
 class ThemeProvider with ChangeNotifier {
-  List<LynouTheme> _themeList = List();
-  LynouTheme _theme;
+  List<LYTheme> _themeList = List();
+  LYTheme _theme;
 
   ThemeProvider() {
     _generateThemeList();
@@ -18,7 +18,7 @@ class ThemeProvider with ChangeNotifier {
 
   /// Generates the list of themes and insert it in the [_themeList].
   _generateThemeList() {
-    LynouTheme _defaultDarkTheme = LynouTheme(
+    LYTheme _defaultDarkTheme = LYTheme(
       id: DEFAULT_THEME_DARK,
       backgroundColor: Color(0xF0212632),
       firstColor: Color(0xFFCB2D3E),
@@ -27,7 +27,7 @@ class ThemeProvider with ChangeNotifier {
       isLight: false,
     );
 
-    LynouTheme _defaultLightTheme = LynouTheme(
+    LYTheme _defaultLightTheme = LYTheme(
       id: DEFAULT_THEME_LIGHT,
       backgroundColor: Color(0xFFFFFFFF),
       firstColor: Color(0xFFCB2D3E),
@@ -74,7 +74,7 @@ class ThemeProvider with ChangeNotifier {
   }
 
   /// Retrieve the background color corresponding to the [_theme]
-  LynouTheme get theme => _theme;
+  LYTheme get theme => _theme;
 
   /// Retrieve the background color corresponding to the [_theme]
   Color get backgroundColor => _theme.backgroundColor;
