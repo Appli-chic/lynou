@@ -6,7 +6,7 @@ class RoundedButton extends StatefulWidget {
   final Function onClick;
 
   RoundedButton({
-    this.text,
+    @required this.text,
     this.onClick,
   });
 

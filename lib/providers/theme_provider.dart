@@ -13,6 +13,7 @@ class ThemeProvider with ChangeNotifier {
 
   ThemeProvider() {
     _generateThemeList();
+    _theme = _themeList[0];
     _loadTheme();
   }
 
@@ -45,10 +46,7 @@ class ThemeProvider with ChangeNotifier {
     final _storage = FlutterSecureStorage();
     String _themeString = await _storage.read(key: KEY_THEME);
 
-    if (_themeString == null) {
-      // If no theme setup yet, then we define the default dark theme.
-      _theme = _themeList[0];
-    } else {
+    if (_themeString != null) {
       // Load the theme if it exists
       _theme = _themeList
           .where((theme) => theme.id == int.parse(_themeString))

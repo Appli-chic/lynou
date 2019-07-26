@@ -3,8 +3,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:lynou/components/forms/error_form.dart';
 
 void main() {
-  testWidgets('Displays one error', (WidgetTester tester) async {
-    await tester.pumpWidget(ErrorForm(errorList: ['Only one error']));
+  testWidgets('ErrorForm - Displays one error', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ErrorForm(errorList: ['Only one error']),
+      ),
+    );
 
     var findByText = find.byType(Text);
     expect(findByText.evaluate().isEmpty, false);
@@ -12,8 +16,12 @@ void main() {
     expect(find.text('Only one error'), findsOneWidget);
   });
 
-  testWidgets('Displays two errors', (WidgetTester tester) async {
-    await tester.pumpWidget(ErrorForm(errorList: ['One error', 'Two error']));
+  testWidgets('ErrorForm - Displays two errors', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ErrorForm(errorList: ['One error', 'Two error']),
+      ),
+    );
 
     var findByText = find.byType(Text);
     expect(findByText.evaluate().isEmpty, false);
@@ -22,8 +30,12 @@ void main() {
     expect(find.text('Two error'), findsOneWidget);
   });
 
-  testWidgets('Displays no error', (WidgetTester tester) async {
-    await tester.pumpWidget(ErrorForm(errorList: []));
+  testWidgets('ErrorForm - Displays no error', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: ErrorForm(errorList: []),
+      ),
+    );
 
     var findByText = find.byType(Text);
     expect(findByText.evaluate().isEmpty, true);

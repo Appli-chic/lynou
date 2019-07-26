@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class ErrorForm extends StatelessWidget {
   final List<String> errorList;
 
-  ErrorForm({this.errorList});
+  ErrorForm({@required this.errorList});
 
   @override
   Widget build(BuildContext context) {
@@ -52,27 +52,24 @@ class ErrorForm extends StatelessWidget {
       return _result;
     }
 
-    return Directionality(
-      textDirection: TextDirection.ltr,
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              Color(0xFFCB2D3E),
-              Color(0xFFEF473A),
-            ],
-          ),
-          borderRadius: BorderRadius.all(
-            const Radius.circular(8.0),
-          ),
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Color(0xFFCB2D3E),
+            Color(0xFFEF473A),
+          ],
         ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: _displayErrors(),
+        borderRadius: BorderRadius.all(
+          const Radius.circular(8.0),
         ),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: _displayErrors(),
       ),
     );
   }

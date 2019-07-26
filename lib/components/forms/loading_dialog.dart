@@ -4,7 +4,7 @@ class LoadingDialog extends StatelessWidget {
   final Widget child;
   final bool isDisplayed;
 
-  LoadingDialog({this.child, this.isDisplayed});
+  LoadingDialog({@required this.child, @required this.isDisplayed});
 
   @override
   Widget build(BuildContext context) {
