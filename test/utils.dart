@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/models/env.dart';
 import 'package:lynou/providers/theme_provider.dart';
@@ -10,8 +11,8 @@ import 'package:provider/provider.dart';
 class MockThemeProvider extends Mock implements ThemeProvider {}
 
 Widget getMainContext({Widget child, AuthService authService}) {
-  AppTranslationsDelegate _newLocaleDelegate =
-      AppTranslationsDelegate(newLocale: Locale('fr', ''));
+  var _newLocaleDelegate = AppTranslationsDelegate(
+      newLocale: Locale('en', ''), isTest: true);
 
   var _env = Env(
     apiUrl: 'http://url_lynou_test.com',

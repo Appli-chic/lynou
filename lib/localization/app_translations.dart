@@ -6,6 +6,7 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class AppTranslations {
   Locale locale;
+  bool isTest = false;
   static Map<dynamic, dynamic> _localisedValues;
 
   AppTranslations(Locale locale) {
@@ -16,17 +17,27 @@ class AppTranslations {
     return Localizations.of<AppTranslations>(context, AppTranslations);
   }
 
-  static Future<AppTranslations> load(Locale locale) async {
+  static Future<AppTranslations> load(Locale locale, bool isTest) async {
     AppTranslations appTranslations = AppTranslations(locale);
-    String jsonContent = await rootBundle.loadString(
-        "assets/languages/localization_${locale.languageCode}.json");
-    _localisedValues = json.decode(jsonContent);
+
+    if (!isTest) {
+      String jsonContent = await rootBundle.loadString(
+          "assets/languages/localization_${locale.languageCode}.json");
+      _localisedValues = json.decode(jsonContent);
+    } else {
+      appTranslations.isTest = true;
+    }
+
     return appTranslations;
   }
 
   get currentLanguage => locale.languageCode;
 
   String text(String key) {
-    return _localisedValues[key] ?? "$key not found";
+    if (isTest) {
+      return key;
+    } else {
+      return _localisedValues[key] ?? key;
+    }
   }
 }

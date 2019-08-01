@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_driver/driver_extension.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:lynou/components/forms/loading_dialog.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/models/env.dart';
 import 'package:lynou/screens/auth/login_screen.dart';
@@ -24,10 +25,12 @@ class MockAuthService extends Mock implements AuthService {
 
 void main() {
   testWidgets('LoginScreen - Displaying', (WidgetTester tester) async {
-    await tester.pumpWidget(getMainContext(
+    var widget = getMainContext(
       child: LoginScreen(),
       authService: MockAuthService(),
-    ));
+    );
+
+    await tester.pumpWidget(widget);
     await tester.pumpAndSettle();
 
     var findByLoginScreen = find.byType(LoginScreen);
@@ -36,12 +39,12 @@ void main() {
 
   testWidgets('LoginScreen - Click on login with empty inputs',
       (WidgetTester tester) async {
-    await tester.pumpWidget(
-      getMainContext(
-        child: LoginScreen(),
-        authService: MockAuthService(),
-      ),
+        var widget = getMainContext(
+          child: LoginScreen(),
+          authService: MockAuthService(),
     );
+
+        await tester.pumpWidget(widget);
     await tester.pumpAndSettle();
 
     var findByLoginScreen = find.byType(LoginScreen);
