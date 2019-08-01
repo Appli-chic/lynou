@@ -89,37 +89,37 @@ class _SignUpScreenState extends State<SignUpScreen> {
         _isLoading = true;
       });
 
-      bool _isValid = true;
-      List<String> _errorList = [];
+      bool isValid = true;
+      List<String> errorList = [];
 
       // Check the email
       if (_validateEmail(_emailController.text) != null) {
-        _isValid = false;
-        _errorList
+        isValid = false;
+        errorList
             .add(AppTranslations.of(context).text("login_email_not_valid"));
       }
 
       // Check the name
       if (_nameController.text.isEmpty) {
-        _isValid = false;
-        _errorList.add(AppTranslations.of(context).text("sign_up_name_empty"));
+        isValid = false;
+        errorList.add(AppTranslations.of(context).text("sign_up_name_empty"));
       }
 
       // Check the password
       if (_validatePassword(_passwordController.text) != null) {
-        _isValid = false;
-        _errorList.add(
+        isValid = false;
+        errorList.add(
             AppTranslations.of(context).text("login_email_password_too_short"));
       }
 
       // Check the passwords are identical
       if (_passwordController.text != _confirmPasswordController.text) {
-        _isValid = false;
-        _errorList.add(AppTranslations.of(context)
+        isValid = false;
+        errorList.add(AppTranslations.of(context)
             .text("sign_up_passwords_not_identical"));
       }
 
-      if (_isValid) {
+      if (isValid) {
         // Sign up the user
         try {
           await _authService.signUp(_emailController.text, _nameController.text,
@@ -138,19 +138,19 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
           if (e is ApiError) {
             if (e.code == ERROR_EMAIL_ALREADY_EXISTS) {
-              _errorList.add(AppTranslations.of(context)
+              errorList.add(AppTranslations.of(context)
                   .text("sign_up_email_already_exists"));
             } else {
-              _errorList.add(AppTranslations.of(context).text("error_server"));
+              errorList.add(AppTranslations.of(context).text("error_server"));
             }
           } else {
-            _errorList.add(AppTranslations.of(context).text("error_server"));
+            errorList.add(AppTranslations.of(context).text("error_server"));
           }
         }
       }
 
       setState(() {
-        _errorList = _errorList;
+        _errorList = errorList;
       });
 
       // Hide the keyboard
@@ -241,7 +241,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
 
     _authService = Provider.of<AuthService>(context);
-    final _size = MediaQuery.of(context).size;
+    final size = MediaQuery
+        .of(context)
+        .size;
 
     return Scaffold(
       body: LoadingDialog(
@@ -251,8 +253,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
             SingleChildScrollView(
               child: ConstrainedBox(
                 constraints: BoxConstraints(
-                  minHeight: _size.height,
-                  minWidth: _size.width,
+                  minHeight: size.height,
+                  minWidth: size.width,
                 ),
                 child: GestureDetector(
                   onTap: () {

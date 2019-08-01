@@ -5,53 +5,53 @@ class ErrorForm extends StatelessWidget {
 
   ErrorForm({@required this.errorList});
 
+  List<Widget> displayErrors() {
+    List<Widget> result = [];
+
+    errorList.asMap().forEach((index, error) {
+      Widget textWidget = Row(
+        mainAxisAlignment: MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Container(
+            margin: EdgeInsets.only(top: 6),
+            width: 5,
+            height: 5,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              shape: BoxShape.circle,
+            ),
+          ),
+          Flexible(
+            child: Padding(
+              padding: const EdgeInsets.only(left: 8),
+              child: Text(
+                error,
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ),
+        ],
+      );
+
+      // Add padding if it's not the first item
+      if (index == 0) {
+        result.add(textWidget);
+      } else {
+        result.add(
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: textWidget,
+          ),
+        );
+      }
+    });
+
+    return result;
+  }
+
   @override
   Widget build(BuildContext context) {
-    List<Widget> _displayErrors() {
-      List<Widget> _result = [];
-
-      errorList.asMap().forEach((index, error) {
-        Widget textWidget = Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.only(top: 6),
-              width: 5,
-              height: 5,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                shape: BoxShape.circle,
-              ),
-            ),
-            Flexible(
-              child: Padding(
-                padding: const EdgeInsets.only(left: 8),
-                child: Text(
-                  error,
-                  style: TextStyle(color: Colors.white),
-                ),
-              ),
-            ),
-          ],
-        );
-
-        // Add padding if it's not the first item
-        if (index == 0) {
-          _result.add(textWidget);
-        } else {
-          _result.add(
-            Padding(
-              padding: const EdgeInsets.only(top: 8),
-              child: textWidget,
-            ),
-          );
-        }
-      });
-
-      return _result;
-    }
-
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(16),
@@ -69,7 +69,7 @@ class ErrorForm extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: _displayErrors(),
+        children: displayErrors(),
       ),
     );
   }

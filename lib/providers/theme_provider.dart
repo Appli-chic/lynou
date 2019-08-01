@@ -43,8 +43,8 @@ class ThemeProvider with ChangeNotifier {
 
   /// Load the [_theme] stored in the secured storage
   _loadTheme() async {
-    final _storage = FlutterSecureStorage();
-    String _themeString = await _storage.read(key: KEY_THEME);
+    final storage = FlutterSecureStorage();
+    String _themeString = await storage.read(key: KEY_THEME);
 
     if (_themeString != null) {
       // Load the theme if it exists

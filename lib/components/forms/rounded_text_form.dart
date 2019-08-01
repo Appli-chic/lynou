@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RoundedTextForm extends StatefulWidget {
+  final Key key;
   final bool obscureText;
   final FocusNode focus;
   final String hint;
@@ -14,6 +15,7 @@ class RoundedTextForm extends StatefulWidget {
 
   RoundedTextForm({
     @required this.hint,
+    this.key,
     this.prefixIconData,
     this.suffixIconData,
     this.textInputType,
@@ -69,20 +71,21 @@ class _RoundedTextFormState extends State<RoundedTextForm> {
 
   @override
   Widget build(BuildContext context) {
-    bool _isObscureText = false;
+    bool isObscureText = false;
 
     if (widget.obscureText != null && widget.obscureText) {
-      _isObscureText = true;
+      isObscureText = true;
     }
 
     return TextField(
+      key: widget.key,
       focusNode: widget.focus,
       controller: widget.textController,
       textInputAction: widget.textInputAction == null
           ? TextInputAction.next
           : widget.textInputAction,
       autocorrect: false,
-      obscureText: _isObscureText,
+      obscureText: isObscureText,
       keyboardType: widget.textInputType == null
           ? TextInputType.text
           : widget.textInputType,
