@@ -29,7 +29,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _newLocaleDelegate = AppTranslationsDelegate(newLocale: null);
+    _newLocaleDelegate = AppTranslationsDelegate(newLocale: null, isTest: false);
     application.onLocaleChanged = onLocaleChange;
 
     _onLoadEnvFile();
