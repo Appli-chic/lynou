@@ -1,8 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/localization/application.dart';
-import 'package:lynou/models/env.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/auth/choose_theme_screen.dart';
 import 'package:lynou/screens/auth/login_screen.dart';
@@ -11,9 +11,15 @@ import 'package:lynou/screens/main_screen.dart';
 import 'package:lynou/screens/auth/signup_screen.dart';
 import 'package:lynou/screens/splash_screen.dart';
 import 'package:lynou/services/auth_service.dart';
+import 'package:lynou/utils/firebase-config.dart';
 import 'package:provider/provider.dart';
 
-void main() {
+void main() async {
+  var _fireBaseConfig = FireBaseConfig();
+  await _fireBaseConfig.initFireBase();
+
+  FirebaseAuth.instance.signOut();
+
   runApp(App());
 }
 
@@ -24,21 +30,12 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   AppTranslationsDelegate _newLocaleDelegate;
-  Env _env = Env();
 
   @override
   void initState() {
     super.initState();
     _newLocaleDelegate = AppTranslationsDelegate(newLocale: null, isTest: false);
     application.onLocaleChanged = onLocaleChange;
-
-    _onLoadEnvFile();
-  }
-
-  /// Load the env file which contains critic data
-  void _onLoadEnvFile() async {
-    _env = await EnvParser().load();
-    setState(() {});
   }
 
   /// Triggers when the [locale] changes
@@ -57,7 +54,7 @@ class _AppState extends State<App> {
     return MultiProvider(
       providers: [
         Provider<AuthService>.value(
-          value: AuthService(env: _env),
+          value: AuthService(),
         ),
         ChangeNotifierProvider<ThemeProvider>.value(
           value: ThemeProvider(),

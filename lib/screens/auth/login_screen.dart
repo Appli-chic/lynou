@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/components/forms/error_form.dart';
 import 'package:lynou/components/forms/loading_dialog.dart';
-import 'package:lynou/models/api_error.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:lynou/utils/constants.dart';
 import 'package:provider/provider.dart';
@@ -110,8 +109,11 @@ class _LoginScreenState extends State<LoginScreen> {
             _isLoading = false;
           });
 
-          if (e is ApiError) {
-            if (e.code == ERROR_EMAIL_PASSWORD_NOT_MATCHING) {
+          if (e is PlatformException) {
+            if (e.code == ERROR_WRONG_PASSWORD) {
+              errorList.add(AppTranslations.of(context)
+                  .text("login_error_email_password_not_matching"));
+            } else if (e.code == ERROR_USER_NOT_FOUND) {
               errorList.add(AppTranslations.of(context)
                   .text("login_error_email_password_not_matching"));
             } else {
@@ -121,6 +123,10 @@ class _LoginScreenState extends State<LoginScreen> {
             errorList.add(AppTranslations.of(context).text("error_server"));
           }
         }
+      } else {
+        setState(() {
+          _isLoading = false;
+        });
       }
 
       setState(() {

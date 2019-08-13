@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/localization/app_translations.dart';
+import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/utils/constants.dart';
+import 'package:provider/provider.dart';
 
 enum ThemeEnum { dark, light }
 
@@ -13,6 +15,7 @@ class ChooseThemeScreen extends StatefulWidget {
 }
 
 class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
+  ThemeProvider _themeProvider;
   ThemeEnum _themeEnum = ThemeEnum.dark;
 
   Widget _displayTitle() {
@@ -82,6 +85,7 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
   _onNextButtonClicked() async {
     final storage = new FlutterSecureStorage();
     await storage.write(key: KEY_THEME, value: _themeEnum.index.toString());
+    _themeProvider.setTheme(_themeEnum.index);
 
     Navigator.pop(context);
     Navigator.pushReplacementNamed(context, '/main');
@@ -90,6 +94,7 @@ class _ChooseThemeScreenState extends State<ChooseThemeScreen> {
   @override
   Widget build(BuildContext context) {
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle.light);
+    _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
 
     return Scaffold(
       body: Theme(
