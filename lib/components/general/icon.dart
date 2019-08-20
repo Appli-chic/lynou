@@ -36,7 +36,7 @@ class LYIcon extends StatelessWidget {
               theme.firstColor,
               theme.secondColor,
             ],
-          ).createShader(rect);
+          ).createShader(Rect.fromLTRB(0, 0, rect.width, rect.height));
         },
         child: Icon(
           iconData,

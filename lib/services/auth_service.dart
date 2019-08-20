@@ -23,8 +23,12 @@ class AuthService {
     await _auth.createUserWithEmailAndPassword(
         email: email, password: password);
 
-    await Firestore.instance.collection('users').document()
-        .setData({ 'email': email, 'name': name });
+    var user = await _auth.currentUser();
+
+    await Firestore.instance
+        .collection('users')
+        .document(user.uid)
+        .setData({'email': email, 'name': name});
   }
 
   /// Check if the user is logged in

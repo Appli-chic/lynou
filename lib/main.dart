@@ -18,7 +18,7 @@ void main() async {
   var _fireBaseConfig = FireBaseConfig();
   await _fireBaseConfig.initFireBase();
 
-  FirebaseAuth.instance.signOut();
+//  FirebaseAuth.instance.signOut();
 
   runApp(App());
 }
