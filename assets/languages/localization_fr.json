@@ -20,5 +20,7 @@
   "choose_theme_dark": "Sombre",
   "choose_theme_light": "Clair",
   "next": "Suivant",
-  "home_title": "Accueil"
+  "home_title": "Accueil",
+  "new_post_title": "Nouvelle publication",
+  "new_post_publish": "Publier"
 }

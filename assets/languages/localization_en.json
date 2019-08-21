@@ -20,5 +20,7 @@
   "choose_theme_dark": "Dark",
   "choose_theme_light": "Light",
   "next": "Next",
-  "home_title": "Home"
+  "home_title": "Home",
+  "new_post_title": "New post",
+  "new_post_publish": "Post"
 }

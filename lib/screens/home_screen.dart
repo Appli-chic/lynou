@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lynou/components/general/floating_action_button.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
+import 'package:lynou/screens/new_post_page.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -12,8 +13,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   ThemeProvider _themeProvider;
 
-  _redirectToNewPostPage() {
-    print("test");
+  _redirectToNewPostPage() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewPostPage()),
+    );
   }
 
   @override
@@ -22,10 +26,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppTranslations.of(context).text("home_title")),
+        title: Text(
+          AppTranslations.of(context).text("home_title"),
+        ),
         backgroundColor: _themeProvider.backgroundColor,
         elevation: 0,
         brightness: _themeProvider.setBrightness(),
+        centerTitle: true,
       ),
       body: Container(
         color: _themeProvider.backgroundColor,

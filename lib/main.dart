@@ -11,6 +11,7 @@ import 'package:lynou/screens/main_screen.dart';
 import 'package:lynou/screens/auth/signup_screen.dart';
 import 'package:lynou/screens/splash_screen.dart';
 import 'package:lynou/services/auth_service.dart';
+import 'package:lynou/services/user_service.dart';
 import 'package:lynou/utils/firebase-config.dart';
 import 'package:provider/provider.dart';
 
@@ -55,6 +56,9 @@ class _AppState extends State<App> {
       providers: [
         Provider<AuthService>.value(
           value: AuthService(),
+        ),
+        Provider<UserService>.value(
+          value: UserService(),
         ),
         ChangeNotifierProvider<ThemeProvider>.value(
           value: ThemeProvider(),
