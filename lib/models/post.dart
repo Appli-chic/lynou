@@ -1,9 +1,14 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+
 class Post {
   String uid;
   String userId;
   String text;
-  DateTime createdAt;
-  DateTime updatedAt;
+  Timestamp createdAt;
+  Timestamp updatedAt;
+
+  // For displaying
+  String name;
 
   Post({
     this.uid,

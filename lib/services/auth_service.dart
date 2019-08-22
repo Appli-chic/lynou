@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:lynou/models/user.dart';
 
 const String ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND";
 const String ERROR_WRONG_PASSWORD = "ERROR_WRONG_PASSWORD";
@@ -12,8 +13,7 @@ class AuthService {
   ///
   /// Throws [PlatformException] if the [email] or [password] is wrong.
   Future<void> login(String email, String password) async {
-    await _auth.signInWithEmailAndPassword(
-        email: email, password: password);
+    await _auth.signInWithEmailAndPassword(email: email, password: password);
   }
 
   /// Signup the user with an [email], [name], [password]
@@ -24,11 +24,17 @@ class AuthService {
         email: email, password: password);
 
     var user = await _auth.currentUser();
+    var newUser = User(
+      email: email,
+      name: name,
+      createdAt: Timestamp.now(),
+      updatedAt: Timestamp.now(),
+    );
 
     await Firestore.instance
         .collection('users')
         .document(user.uid)
-        .setData({'email': email, 'name': name});
+        .setData(newUser.toJson());
   }
 
   /// Check if the user is logged in

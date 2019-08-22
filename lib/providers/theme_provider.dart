@@ -22,6 +22,7 @@ class ThemeProvider with ChangeNotifier {
     LYTheme _defaultDarkTheme = LYTheme(
       id: DEFAULT_THEME_DARK,
       backgroundColor: Color(0xF0212632),
+      secondBackgroundColor: Color(0xFF3D4354),
       firstColor: Color(0xFFCB2D3E),
       secondColor: Color(0xFFEF473A),
       textColor: Color(0xFFFFFFFF),
@@ -32,6 +33,7 @@ class ThemeProvider with ChangeNotifier {
     LYTheme _defaultLightTheme = LYTheme(
       id: DEFAULT_THEME_LIGHT,
       backgroundColor: Color(0xFFFFFFFF),
+      secondBackgroundColor: Color(0xFF666666),
       firstColor: Color(0xFFCB2D3E),
       secondColor: Color(0xFFEF473A),
       textColor: Color(0xFF464646),
@@ -78,6 +80,9 @@ class ThemeProvider with ChangeNotifier {
 
   /// Retrieve the background color corresponding to the [_theme]
   Color get backgroundColor => _theme.backgroundColor;
+
+  // Retrieve the second background color corresponding to the [_theme]
+  Color get secondBackgroundColor => _theme.secondBackgroundColor;
 
   /// Retrieve the first color corresponding to the [_theme]
   Color get firstColor => _theme.firstColor;

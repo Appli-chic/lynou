@@ -14,10 +14,16 @@ import 'package:lynou/services/auth_service.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:lynou/utils/firebase-config.dart';
 import 'package:provider/provider.dart';
+import 'package:timeago/timeago.dart' as timeago;
+
 
 void main() async {
+  // Config Firebase
   var _fireBaseConfig = FireBaseConfig();
   await _fireBaseConfig.initFireBase();
+
+  // Config locales for timeago
+  timeago.setLocaleMessages('fr', timeago.FrMessages());
 
 //  FirebaseAuth.instance.signOut();
 

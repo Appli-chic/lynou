@@ -24,6 +24,7 @@ dependencies:
   flutter_secure_storage: ^3.2.1+1
   uuid: ^2.0.2
   cache_image: ^0.0.3
+  timeago: ^2.0.18
 
   firebase_core: ^0.4.0+8
   firebase_analytics: ^5.0.0

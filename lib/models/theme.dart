@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 class LYTheme {
   final int id;
   final Color backgroundColor;
+  final Color secondBackgroundColor;
   final Color firstColor;
   final Color secondColor;
   final Color textColor;
@@ -12,6 +13,7 @@ class LYTheme {
   LYTheme({
     @required this.id,
     @required this.backgroundColor,
+    @required this.secondBackgroundColor,
     @required this.firstColor,
     @required this.secondColor,
     @required this.textColor,

@@ -22,9 +22,10 @@ class _NewPostPageState extends State<NewPostPage> {
     _userService = Provider.of<UserService>(context);
 
     /// Send the post to FireBase and upload files
-    _sendPost() {
+    _sendPost() async {
       if (_textController.text != null && _textController.text.isNotEmpty) {
-        _userService.createPost(_textController.text);
+        var post = await _userService.createPost(_textController.text);
+        Navigator.of(context).pop(post);
       }
     }
 
