@@ -6,6 +6,7 @@ class LYTheme {
   final Color firstColor;
   final Color secondColor;
   final Color textColor;
+  final Color secondTextColor;
   final bool isLight;
 
   LYTheme({
@@ -14,6 +15,7 @@ class LYTheme {
     @required this.firstColor,
     @required this.secondColor,
     @required this.textColor,
+    @required this.secondTextColor,
     @required this.isLight,
   });
 }

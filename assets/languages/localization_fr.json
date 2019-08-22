@@ -22,5 +22,7 @@
   "next": "Suivant",
   "home_title": "Accueil",
   "new_post_title": "Nouvelle publication",
-  "new_post_publish": "Publier"
+  "new_post_publish": "Publier",
+  "new_post_hint": "Quoi de neuf?",
+  "send": "Envoyer"
 }
