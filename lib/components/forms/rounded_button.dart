@@ -26,7 +26,7 @@ class _RoundedButtonState extends State<RoundedButton> {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: widget.height != null ? widget.height: 48,
+      height: widget.height != null ? widget.height : 48,
       child: FlatButton(
         padding: EdgeInsets.all(0),
         onPressed: () {
@@ -41,7 +41,8 @@ class _RoundedButtonState extends State<RoundedButton> {
                 RED_SECOND_COLOR,
               ],
             ),
-            borderRadius: BorderRadius.all(Radius.circular(widget.cornerRadius != null ? widget.cornerRadius : 28)),
+            borderRadius: BorderRadius.all(Radius.circular(
+                widget.cornerRadius != null ? widget.cornerRadius : 28)),
           ),
           child: Center(
             child: Text(

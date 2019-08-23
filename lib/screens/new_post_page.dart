@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
@@ -6,6 +8,7 @@ import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:provider/provider.dart';
+import 'package:image_picker/image_picker.dart';
 
 class NewPostPage extends StatefulWidget {
   @override
@@ -16,6 +19,14 @@ class _NewPostPageState extends State<NewPostPage> {
   TextEditingController _textController = TextEditingController();
   ThemeProvider _themeProvider;
   UserService _userService;
+
+  Future _getImageFromCamera() async {
+    File image = await ImagePicker.pickImage(source: ImageSource.camera);
+
+    if(image != null) {
+      print(image.path);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -64,7 +75,7 @@ class _NewPostPageState extends State<NewPostPage> {
                   ),
                   Expanded(
                     child: Container(
-                      margin: EdgeInsets.only(top: 16, right: 16),
+                      margin: EdgeInsets.only(top: 8, right: 16),
                       child: TextField(
                         controller: _textController,
                         decoration: InputDecoration(
@@ -88,7 +99,7 @@ class _NewPostPageState extends State<NewPostPage> {
               child: Row(
                 children: <Widget>[
                   IconButton(
-                    onPressed: () {},
+                    onPressed: _getImageFromCamera,
                     icon: Icon(
                       Icons.camera_alt,
                       color: _themeProvider.textColor,
