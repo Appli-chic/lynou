@@ -54,7 +54,7 @@ class _PostFeedState extends State<PostFeed> {
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
                               color: _themeProvider.textColor,
-                              fontWeight: FontWeight.w600,
+                              fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
                           ),
@@ -85,7 +85,8 @@ class _PostFeedState extends State<PostFeed> {
           overflow: TextOverflow.ellipsis,
           style: TextStyle(
             color: _themeProvider.textColor,
-            fontSize: 15,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
           ),
         ),
         Row(

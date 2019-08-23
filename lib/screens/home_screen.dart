@@ -67,12 +67,19 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: Container(
         color: _themeProvider.backgroundColor,
-        child: ListView.builder(
+        child: ListView.separated(
           itemCount: _postList.length,
           itemBuilder: (context, index) {
             return Container(
-              margin: EdgeInsets.only(left: 16, right: 16),
+              margin: EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
               child: PostFeed(post: _postList[index]),
+            );
+          },
+          separatorBuilder: (context, index) {
+            return Divider(
+              color: _themeProvider.textColor,
+              indent: 16,
+              endIndent: 16,
             );
           },
         ),

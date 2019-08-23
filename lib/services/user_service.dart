@@ -62,9 +62,10 @@ class UserService {
     var query = await Firestore.instance
         .collection('posts')
         .where('userId', isEqualTo: user.uid)
+        .orderBy('updatedAt', descending: true)
         .getDocuments();
 
-    for(var document in query.documents) {
+    for (var document in query.documents) {
       var post = Post.fromJson(document.data);
       var user = await getUserFromCacheIfExists(document.data['userId']);
 

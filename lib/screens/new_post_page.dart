@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/components/general/avatar.dart';
@@ -24,7 +25,10 @@ class _NewPostPageState extends State<NewPostPage> {
     /// Send the post to FireBase and upload files
     _sendPost() async {
       if (_textController.text != null && _textController.text.isNotEmpty) {
+        var user = await FirebaseAuth.instance.currentUser();
         var post = await _userService.createPost(_textController.text);
+        var newUser = await _userService.getUserFromCacheIfExists(user.uid);
+        post.name = newUser.name;
         Navigator.of(context).pop(post);
       }
     }
