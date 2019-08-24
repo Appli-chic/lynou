@@ -1,37 +1,39 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-class Post {
+class LYFile {
   String uid;
   String userId;
-  String text;
+  String postId;
+  String path;
+  String type;
   Timestamp createdAt;
   Timestamp updatedAt;
 
-  // For displaying
-  String name;
-
-  Post({
+  LYFile({
     this.uid,
     this.userId,
-    this.text,
+    this.postId,
+    this.path,
     this.createdAt,
     this.updatedAt,
   });
 
-  factory Post.fromJson(Map<String, dynamic> jsonMap) {
-    return Post(
+  factory LYFile.fromJson(Map<String, dynamic> jsonMap) {
+    return LYFile(
       uid: jsonMap["uid"],
       userId: jsonMap["userId"],
-      text: jsonMap["text"],
+      postId: jsonMap["postId"],
+      path: jsonMap["path"],
       createdAt: jsonMap["createdAt"],
       updatedAt: jsonMap["updatedAt"],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'userId': userId,
-        'text': text,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
-      };
+    'userId': userId,
+    'postId': postId,
+    'path': path,
+    'createdAt': createdAt,
+    'updatedAt': updatedAt,
+  };
 }

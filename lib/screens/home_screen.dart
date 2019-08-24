@@ -30,7 +30,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     if (post != null) {
       // Add the post in the feed
-      _postList.add(post);
+      _postList.insert(0, post);
     }
   }
 

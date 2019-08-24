@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/services.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:lynou/models/file.dart';
+import 'package:path/path.dart';
 import 'package:lynou/models/post.dart';
 import 'package:lynou/models/user.dart';
 
@@ -20,15 +24,12 @@ class UserService {
 
       user = User.fromJson(document.data);
     } catch (e) {
-      if (e is PlatformException && e.code == "Error 14") {
-        // Can't find the user in the cache. We need to ask the server
-        var document = await Firestore.instance
-            .collection('users')
-            .document(userId)
-            .get(source: Source.server);
+      var document = await Firestore.instance
+          .collection('users')
+          .document(userId)
+          .get(source: Source.server);
 
-        user = User.fromJson(document.data);
-      }
+      user = User.fromJson(document.data);
     }
 
     return user;
@@ -37,8 +38,33 @@ class UserService {
   /// Create a post directly in firebase
   ///
   /// It sends the written [text] and is assigned to the user with the user's id
-  Future<Post> createPost(String text) async {
+  /// If the the post also contains [files] to upload
+  Future<Post> createPost(String text, List<File> files) async {
     var user = await _auth.currentUser();
+    var postId = Firestore.instance.collection('posts').document().documentID;
+
+    // Upload files if they exist
+    for (var file in files) {
+      String path = 'users/${user.uid}/posts/${basename(file.path)}';
+      final StorageReference storageReference =
+          FirebaseStorage().ref().child(path);
+      StorageUploadTask uploadTask = storageReference.putFile(file);
+      await uploadTask.onComplete;
+
+      // Add the file in the database
+      LYFile lyFile = LYFile(
+        userId: user.uid,
+        postId: postId,
+        path: path,
+        createdAt: Timestamp.now(),
+        updatedAt: Timestamp.now(),
+      );
+
+      await Firestore.instance
+          .collection('files')
+          .document()
+          .setData(lyFile.toJson());
+    }
 
     var post = Post(
       userId: user.uid,

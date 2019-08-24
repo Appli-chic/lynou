@@ -16,7 +16,7 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> jsonMap) {
-    return new User(
+    return User(
       uid: jsonMap["uid"],
       email: jsonMap["email"],
       name: jsonMap["name"],

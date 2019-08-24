@@ -4,9 +4,12 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/components/general/avatar.dart';
+import 'package:lynou/components/image_preview.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
+import 'package:lynou/screens/utils/viewer.dart';
 import 'package:lynou/services/user_service.dart';
+import 'package:lynou/utils/compressor.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 
@@ -20,29 +23,122 @@ class _NewPostPageState extends State<NewPostPage> {
   ThemeProvider _themeProvider;
   UserService _userService;
 
+  List<File> _fileList = List();
+
+  /// Call the camera and retrieve the photo taken
+  /// Ask the permission to access the camera if it not granted yet.
   Future _getImageFromCamera() async {
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
-
-    if(image != null) {
-      print(image.path);
+    if (image != null) {
+      image = await Compressor.compressFile(image);
+      _fileList.add(image);
+      setState(() {});
     }
+  }
+
+  /// Call the Gallery and retrieve the photos
+  Future _getImageFromGallery() async {
+    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (image != null) {
+      image = await Compressor.compressFile(image);
+      _fileList.add(image);
+      setState(() {});
+    }
+  }
+
+  /// Send the post to FireBase and upload files
+  _sendPost() async {
+    if (_textController.text != null && _textController.text.isNotEmpty) {
+      var user = await FirebaseAuth.instance.currentUser();
+      var post = await _userService.createPost(_textController.text, _fileList);
+      var newUser = await _userService.getUserFromCacheIfExists(user.uid);
+      post.name = newUser.name;
+      Navigator.of(context).pop(post);
+    }
+  }
+
+  List<Widget> _generatesPreviews() {
+    List<Widget> result = [];
+
+    _fileList.asMap().forEach((index, file) {
+      result.add(ImagePreview(
+        file: file,
+        index: index,
+        onTap: _onFileClicked,
+        onRemove: _onFileRemoved,
+      ));
+    });
+
+    return result;
+  }
+
+  /// Displays the bottom bar containing the actions:
+  /// - Taking a photo
+  /// - Selecting photos from the gallery
+  /// - Send the post
+  Widget _displaysBottomBar() {
+    return Container(
+      margin: EdgeInsets.all(16),
+      child: Row(
+        children: <Widget>[
+          IconButton(
+            onPressed: _getImageFromCamera,
+            icon: Icon(
+              Icons.camera_alt,
+              color: _themeProvider.textColor,
+              size: 30,
+            ),
+          ),
+          IconButton(
+            onPressed: _getImageFromGallery,
+            icon: Icon(
+              Icons.photo_library,
+              color: _themeProvider.textColor,
+              size: 30,
+            ),
+          ),
+          Spacer(),
+          RoundedButton(
+            onClick: _sendPost,
+            text: AppTranslations.of(context).text("send"),
+            width: 80,
+            height: 40,
+            textSize: 15,
+            cornerRadius: 10,
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Show the preview of the file into a new page.
+  /// Only supports images.
+  _onFileClicked(File file) async {
+    int index = _fileList.indexOf(file);
+
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Viewer(
+          files: _fileList,
+          index: index,
+        ),
+      ),
+    );
+  }
+
+  /// Triggers when the user click to remove the file from the list.
+  /// This function removes the file from the list and rebuild.
+  _onFileRemoved(File file) {
+    int index = _fileList.indexOf(file);
+    _fileList.removeAt(index);
+    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
     _userService = Provider.of<UserService>(context);
-
-    /// Send the post to FireBase and upload files
-    _sendPost() async {
-      if (_textController.text != null && _textController.text.isNotEmpty) {
-        var user = await FirebaseAuth.instance.currentUser();
-        var post = await _userService.createPost(_textController.text);
-        var newUser = await _userService.getUserFromCacheIfExists(user.uid);
-        post.name = newUser.name;
-        Navigator.of(context).pop(post);
-      }
-    }
 
     return Scaffold(
       appBar: AppBar(
@@ -88,6 +184,7 @@ class _NewPostPageState extends State<NewPostPage> {
                         style: TextStyle(color: _themeProvider.textColor),
                         keyboardType: TextInputType.multiline,
                         maxLines: null,
+                        textCapitalization: TextCapitalization.sentences,
                       ),
                     ),
                   )
@@ -95,37 +192,16 @@ class _NewPostPageState extends State<NewPostPage> {
               ),
             ),
             Container(
-              margin: EdgeInsets.all(16),
-              child: Row(
-                children: <Widget>[
-                  IconButton(
-                    onPressed: _getImageFromCamera,
-                    icon: Icon(
-                      Icons.camera_alt,
-                      color: _themeProvider.textColor,
-                      size: 30,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () {},
-                    icon: Icon(
-                      Icons.photo_library,
-                      color: _themeProvider.textColor,
-                      size: 30,
-                    ),
-                  ),
-                  Spacer(),
-                  RoundedButton(
-                    onClick: _sendPost,
-                    text: AppTranslations.of(context).text("send"),
-                    width: 80,
-                    height: 40,
-                    textSize: 15,
-                    cornerRadius: 10,
-                  ),
-                ],
+              margin: EdgeInsets.only(top: 8, right: 16, left: 16),
+              child: GridView.count(
+                crossAxisCount: 4,
+                mainAxisSpacing: 8,
+                crossAxisSpacing: 8,
+                shrinkWrap: true,
+                children: _generatesPreviews(),
               ),
-            )
+            ),
+            _displaysBottomBar(),
           ],
         ),
       ),
