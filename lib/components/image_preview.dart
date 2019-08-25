@@ -7,12 +7,14 @@ class ImagePreview extends StatefulWidget {
   final int index;
   final Function(File) onTap;
   final Function(File) onRemove;
+  final bool isRemovable;
 
   ImagePreview({
     @required this.file,
     @required this.onTap,
-    @required this.index,
-    @required this.onRemove,
+    this.index,
+    this.onRemove,
+    this.isRemovable,
   });
 
   @override
@@ -20,6 +22,35 @@ class ImagePreview extends StatefulWidget {
 }
 
 class _ImagePreviewState extends State<ImagePreview> {
+  Widget _displaysDeleteIcon() {
+    if (widget.isRemovable) {
+      return Align(
+        alignment: Alignment.topRight,
+        child: ConstrainedBox(
+          constraints: BoxConstraints.loose(Size(20, 20)),
+          child: GestureDetector(
+            onTap: () {
+              widget.onRemove(widget.file);
+            },
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Container(
+                color: Colors.black45,
+                child: Icon(
+                  Icons.close,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -31,7 +62,6 @@ class _ImagePreviewState extends State<ImagePreview> {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(4),
           child: Stack(
-//            fit: StackFit.expand,
             children: <Widget>[
               ConstrainedBox(
                 constraints: BoxConstraints.expand(),
@@ -42,28 +72,7 @@ class _ImagePreviewState extends State<ImagePreview> {
                   ),
                 ),
               ),
-              Align(
-                alignment: Alignment.topRight,
-                child: ConstrainedBox(
-                  constraints: BoxConstraints.loose(Size(20, 20)),
-                  child: GestureDetector(
-                    onTap: () {
-                      widget.onRemove(widget.file);
-                    },
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(4),
-                      child: Container(
-                        color: Colors.black45,
-                        child: Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
+              _displaysDeleteIcon(),
             ],
           ),
         ),

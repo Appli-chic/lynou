@@ -15,6 +15,8 @@ import 'package:lynou/utils/firebase-config.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
+import 'localization/timeago/fr_short_messages.dart';
+
 
 void main() async {
   // Config Firebase
@@ -23,6 +25,7 @@ void main() async {
 
   // Config locales for timeago
   timeago.setLocaleMessages('fr', timeago.FrMessages());
+  timeago.setLocaleMessages('fr_short', FrShortMessages());
 
   runApp(App());
 }

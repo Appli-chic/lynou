@@ -37,10 +37,46 @@ class _PostFeedState extends State<PostFeed> {
         margin: EdgeInsets.only(top: 8),
         child: CacheImage.firebase(
           fit: BoxFit.fitWidth,
-          path: 'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}',
+          path:
+              'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}',
           placeholder: Container(
+            height: 150,
             color: _themeProvider.secondBackgroundColor,
           ),
+        ),
+      );
+    } else if (widget.post.fileList != null &&
+        widget.post.fileList.length > 1) {
+      // Displays more than one media
+      List<Widget> listAssets = [];
+
+      final size = MediaQuery.of(context).size;
+
+      for (var file in widget.post.fileList) {
+        listAssets.add(
+          CacheImage.firebase(
+            fit: BoxFit.cover,
+            width: (size.width - 32 / 4),
+            height: 100,
+            path: 'users/${widget.post.userId}/posts/${widget.post.uid}/$file',
+            placeholder: Container(
+              width: (size.width - 32 / 4),
+              height: 100,
+              color: _themeProvider.secondBackgroundColor,
+            ),
+          ),
+        );
+      }
+
+      return Container(
+        color: _themeProvider.secondBackgroundColor,
+        margin: EdgeInsets.only(top: 8),
+        child: GridView.count(
+          crossAxisCount: 4,
+          mainAxisSpacing: 6,
+          crossAxisSpacing: 6,
+          shrinkWrap: true,
+          children: listAssets,
         ),
       );
     }
@@ -52,9 +88,12 @@ class _PostFeedState extends State<PostFeed> {
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
 
+    var languageCode =
+        AppTranslations.of(context).locale.languageCode.split("_")[0] +
+            "_short";
     final timeFormatted = timeago.format(
       widget.post.createdAt.toDate(),
-      locale: AppTranslations.of(context).locale.languageCode,
+      locale: languageCode,
     );
 
     return Column(

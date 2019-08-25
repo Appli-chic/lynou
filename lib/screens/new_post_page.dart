@@ -41,7 +41,7 @@ class _NewPostPageState extends State<NewPostPage> {
   Future _getImageFromGallery() async {
     var assets = await Gallery.pickAssets(context, _themeProvider);
     if (assets.isNotEmpty) {
-      for(var asset in assets) {
+      for (var asset in assets) {
         var file = await asset.file;
         var compressedFile = await Compressor.compressFile(file);
         _fileList.add(compressedFile);
@@ -65,12 +65,14 @@ class _NewPostPageState extends State<NewPostPage> {
     List<Widget> result = [];
 
     _fileList.asMap().forEach((index, file) {
-      result.add(ImagePreview(
-        file: file,
-        index: index,
-        onTap: _onFileClicked,
-        onRemove: _onFileRemoved,
-      ));
+      result.add(
+        ImagePreview(
+          file: file,
+          index: index,
+          onTap: _onFileClicked,
+          onRemove: _onFileRemoved,
+        ),
+      );
     });
 
     return result;
