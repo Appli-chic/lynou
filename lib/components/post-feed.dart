@@ -1,3 +1,4 @@
+import 'package:cache_image/cache_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/avatar.dart';
 import 'package:lynou/components/general/chip.dart';
@@ -21,6 +22,32 @@ class PostFeed extends StatefulWidget {
 class _PostFeedState extends State<PostFeed> {
   ThemeProvider _themeProvider;
 
+  /// Displays photos an videos linked to the post
+  /// Videos are displayed with a thumbnail image and a video logo
+  ///
+  /// If there is only one media, we display it on the whole width
+  /// If there is more than one media we display them in a grid
+  ///
+  /// The maximum of medias displayed is 8
+  /// When more than 8 are displayed we show a + in the last media.
+  Widget _displaysMedia() {
+    // Displays only one media
+    if (widget.post.fileList != null && widget.post.fileList.length == 1) {
+      return Container(
+        margin: EdgeInsets.only(top: 8),
+        child: CacheImage.firebase(
+          fit: BoxFit.fitWidth,
+          path: 'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}',
+          placeholder: Container(
+            color: _themeProvider.secondBackgroundColor,
+          ),
+        ),
+      );
+    }
+
+    return Container();
+  }
+
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
@@ -36,10 +63,10 @@ class _PostFeedState extends State<PostFeed> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
-            LYAvatar(size: 55),
+            LYAvatar(size: 50),
             Expanded(
               child: Container(
-                height: 55,
+                height: 50,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,7 +84,7 @@ class _PostFeedState extends State<PostFeed> {
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
                                 color: _themeProvider.textColor,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 fontSize: 15,
                               ),
                             ),
@@ -92,10 +119,11 @@ class _PostFeedState extends State<PostFeed> {
             style: TextStyle(
               color: _themeProvider.textColor,
               fontSize: 14,
-              fontWeight: FontWeight.w500,
+              fontWeight: FontWeight.w400,
             ),
           ),
         ),
+        _displaysMedia(),
         Row(
           children: <Widget>[
             Container(

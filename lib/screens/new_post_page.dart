@@ -7,6 +7,7 @@ import 'package:lynou/components/general/avatar.dart';
 import 'package:lynou/components/image_preview.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
+import 'package:lynou/screens/utils/gallery.dart';
 import 'package:lynou/screens/utils/viewer.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:lynou/utils/compressor.dart';
@@ -38,10 +39,13 @@ class _NewPostPageState extends State<NewPostPage> {
 
   /// Call the Gallery and retrieve the photos
   Future _getImageFromGallery() async {
-    File image = await ImagePicker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      image = await Compressor.compressFile(image);
-      _fileList.add(image);
+    var assets = await Gallery.pickAssets(context, _themeProvider);
+    if (assets.isNotEmpty) {
+      for(var asset in assets) {
+        var file = await asset.file;
+        var compressedFile = await Compressor.compressFile(file);
+        _fileList.add(compressedFile);
+      }
       setState(() {});
     }
   }

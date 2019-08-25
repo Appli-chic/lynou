@@ -1,4 +1,3 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
@@ -25,8 +24,6 @@ void main() async {
   // Config locales for timeago
   timeago.setLocaleMessages('fr', timeago.FrMessages());
 
-//  FirebaseAuth.instance.signOut();
-
   runApp(App());
 }
 
@@ -41,7 +38,7 @@ class _AppState extends State<App> {
   @override
   void initState() {
     super.initState();
-    _newLocaleDelegate = AppTranslationsDelegate(newLocale: null, isTest: false);
+    _newLocaleDelegate = AppTranslationsDelegate(newLocale: null);
     application.onLocaleChanged = onLocaleChange;
   }
 

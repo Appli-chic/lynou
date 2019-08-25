@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/floating_action_button.dart';
 import 'package:lynou/components/post-feed.dart';
@@ -41,9 +42,19 @@ class _HomeScreenState extends State<HomeScreen> {
         _isStartedOnce = true;
       });
 
-      var postList = await _userService.fetchWallPosts();
+      // Get posts from cache
+      List<Post> postsFromCache =
+          await _userService.fetchWallPosts(Source.cache);
       setState(() {
-        _postList = postList;
+        _postList = postsFromCache;
+      });
+
+      // Get posts from the server
+      _userService.fetchWallPosts(Source.server).then((posts) {
+        _postList.clear();
+        _postList = posts;
+
+        setState(() {});
       });
     }
   }

@@ -5,9 +5,8 @@ import 'package:lynou/localization/application.dart';
 
 class AppTranslationsDelegate extends LocalizationsDelegate<AppTranslations> {
   final Locale newLocale;
-  bool isTest = false;
 
-  AppTranslationsDelegate({this.newLocale, this.isTest});
+  AppTranslationsDelegate({this.newLocale});
 
   @override
   bool isSupported(Locale locale) {
@@ -16,7 +15,7 @@ class AppTranslationsDelegate extends LocalizationsDelegate<AppTranslations> {
 
   @override
   Future<AppTranslations> load(Locale locale) {
-    return AppTranslations.load(newLocale ?? locale, isTest);
+    return AppTranslations.load(newLocale ?? locale);
   }
 
   @override

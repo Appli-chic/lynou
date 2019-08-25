@@ -53,12 +53,6 @@ class _MainScreenState extends State<MainScreen> {
           title: const SizedBox(),
         ),
         BottomNavigationBarItem(
-          icon: LYIcon(iconData: Icons.folder, color: _themeProvider.textColor),
-          activeIcon:
-              LYIcon(iconData: Icons.folder, theme: _themeProvider.theme),
-          title: const SizedBox(),
-        ),
-        BottomNavigationBarItem(
           icon: LYIcon(iconData: Icons.search, color: _themeProvider.textColor),
           activeIcon:
               LYIcon(iconData: Icons.search, theme: _themeProvider.theme),
