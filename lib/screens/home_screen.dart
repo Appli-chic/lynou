@@ -14,7 +14,7 @@ class HomeScreen extends StatefulWidget {
   _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMixin<HomeScreen>  {
   ThemeProvider _themeProvider;
   UserService _userService;
 
@@ -61,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
     _userService = Provider.of<UserService>(context);
 
@@ -102,4 +103,7 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

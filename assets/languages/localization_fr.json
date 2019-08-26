@@ -24,5 +24,8 @@
   "new_post_title": "Nouvelle publication",
   "new_post_publish": "Publier",
   "new_post_hint": "Quoi de neuf?",
-  "send": "Envoyer"
+  "new_post_error_empty": "Votre publication ne doit pas être vide.",
+  "send": "Envoyer",
+  "error_dialog": "Erreur",
+  "ok": "OK"
 }

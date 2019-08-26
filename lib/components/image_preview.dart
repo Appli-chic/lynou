@@ -7,14 +7,12 @@ class ImagePreview extends StatefulWidget {
   final int index;
   final Function(File) onTap;
   final Function(File) onRemove;
-  final bool isRemovable;
 
   ImagePreview({
     @required this.file,
     @required this.onTap,
     this.index,
     this.onRemove,
-    this.isRemovable,
   });
 
   @override
@@ -23,7 +21,7 @@ class ImagePreview extends StatefulWidget {
 
 class _ImagePreviewState extends State<ImagePreview> {
   Widget _displaysDeleteIcon() {
-    if (widget.isRemovable) {
+    if (widget.onRemove != null) {
       return Align(
         alignment: Alignment.topRight,
         child: ConstrainedBox(

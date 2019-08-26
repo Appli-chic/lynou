@@ -24,5 +24,8 @@
   "new_post_title": "New post",
   "new_post_publish": "Post",
   "new_post_hint": "What's new?",
-  "send": "Send"
+  "new_post_error_empty": "Your post must not be empty.",
+  "send": "Send",
+  "error_dialog": "Error",
+  "ok": "OK"
 }

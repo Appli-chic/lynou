@@ -2,13 +2,15 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lynou/components/forms/loading_dialog.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/components/general/avatar.dart';
+import 'package:lynou/components/general/error-dialog.dart';
 import 'package:lynou/components/image_preview.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/gallery.dart';
-import 'package:lynou/screens/utils/viewer.dart';
+import 'package:lynou/screens/utils/viewer/viewer.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:lynou/utils/compressor.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +27,7 @@ class _NewPostPageState extends State<NewPostPage> {
   UserService _userService;
 
   List<File> _fileList = List();
+  bool _isLoading = false;
 
   /// Call the camera and retrieve the photo taken
   /// Ask the permission to access the camera if it not granted yet.
@@ -52,15 +55,35 @@ class _NewPostPageState extends State<NewPostPage> {
 
   /// Send the post to FireBase and upload files
   _sendPost() async {
-    if (_textController.text != null && _textController.text.isNotEmpty) {
+    if ((_textController.text != null && _textController.text.isNotEmpty) ||
+        _fileList.isNotEmpty) {
+      // Send the post
+      this.setState(() {
+        _isLoading = true;
+      });
+
       var user = await FirebaseAuth.instance.currentUser();
       var post = await _userService.createPost(_textController.text, _fileList);
       var newUser = await _userService.getUserFromCacheIfExists(user.uid);
       post.name = newUser.name;
+
+      this.setState(() {
+        _isLoading = false;
+      });
+
       Navigator.of(context).pop(post);
+    } else {
+      // Show error message
+      var errorDialog = ErrorDialog(
+        context: context,
+        themeProvider: _themeProvider,
+        description: AppTranslations.of(context).text("new_post_error_empty"),
+      );
+      errorDialog.show();
     }
   }
 
+  /// Generates preview photos for the selected medias to send.
   List<Widget> _generatesPreviews() {
     List<Widget> result = [];
 
@@ -146,69 +169,72 @@ class _NewPostPageState extends State<NewPostPage> {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
     _userService = Provider.of<UserService>(context);
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          AppTranslations.of(context).text("new_post_title"),
+    return LoadingDialog(
+      isDisplayed: _isLoading,
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            AppTranslations.of(context).text("new_post_title"),
+          ),
+          leading: IconButton(
+            icon: Icon(Icons.close),
+            onPressed: () => Navigator.of(context).pop(null),
+          ),
+          centerTitle: true,
+          backgroundColor: _themeProvider.backgroundColor,
+          elevation: 0,
+          brightness: _themeProvider.setBrightness(),
         ),
-        leading: IconButton(
-          icon: Icon(Icons.close),
-          onPressed: () => Navigator.of(context).pop(null),
-        ),
-        centerTitle: true,
-        backgroundColor: _themeProvider.backgroundColor,
-        elevation: 0,
-        brightness: _themeProvider.setBrightness(),
-      ),
-      body: Container(
-        color: _themeProvider.backgroundColor,
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Expanded(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Container(
-                    margin: EdgeInsets.all(16),
-                    child: LYAvatar(),
-                  ),
-                  Expanded(
-                    child: Container(
-                      margin: EdgeInsets.only(top: 8, right: 16),
-                      child: TextField(
-                        controller: _textController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          hintText:
-                              AppTranslations.of(context).text("new_post_hint"),
-                          hintStyle:
-                              TextStyle(color: _themeProvider.secondTextColor),
-                        ),
-                        style: TextStyle(color: _themeProvider.textColor),
-                        keyboardType: TextInputType.multiline,
-                        maxLines: null,
-                        textCapitalization: TextCapitalization.sentences,
-                      ),
+        body: Container(
+          color: _themeProvider.backgroundColor,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Expanded(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Container(
+                      margin: EdgeInsets.all(16),
+                      child: LYAvatar(),
                     ),
-                  )
-                ],
+                    Expanded(
+                      child: Container(
+                        margin: EdgeInsets.only(top: 8, right: 16),
+                        child: TextField(
+                          controller: _textController,
+                          decoration: InputDecoration(
+                            border: InputBorder.none,
+                            hintText: AppTranslations.of(context)
+                                .text("new_post_hint"),
+                            hintStyle: TextStyle(
+                                color: _themeProvider.secondTextColor),
+                          ),
+                          style: TextStyle(color: _themeProvider.textColor),
+                          keyboardType: TextInputType.multiline,
+                          maxLines: null,
+                          textCapitalization: TextCapitalization.sentences,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ),
-            ),
-            Container(
-              margin: EdgeInsets.only(top: 8, right: 16, left: 16),
-              child: GridView.count(
-                crossAxisCount: 4,
-                mainAxisSpacing: 8,
-                crossAxisSpacing: 8,
-                shrinkWrap: true,
-                children: _generatesPreviews(),
+              Container(
+                margin: EdgeInsets.only(top: 8, right: 16, left: 16),
+                height: 150,
+                child: GridView.count(
+                  crossAxisCount: 4,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                  children: _generatesPreviews(),
+                ),
               ),
-            ),
-            _displaysBottomBar(),
-          ],
+              _displaysBottomBar(),
+            ],
+          ),
         ),
       ),
     );

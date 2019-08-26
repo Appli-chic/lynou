@@ -5,6 +5,7 @@ import 'package:lynou/components/general/chip.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/models/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
+import 'package:lynou/screens/utils/viewer/viewer.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -33,15 +34,31 @@ class _PostFeedState extends State<PostFeed> {
   Widget _displaysMedia() {
     // Displays only one media
     if (widget.post.fileList != null && widget.post.fileList.length == 1) {
-      return Container(
-        margin: EdgeInsets.only(top: 8),
-        child: CacheImage.firebase(
-          fit: BoxFit.fitWidth,
-          path:
-              'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}',
-          placeholder: Container(
-            height: 150,
-            color: _themeProvider.secondBackgroundColor,
+      var listFirebaseUrl = List<String>();
+      var firebaseUrl = 'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}';
+      listFirebaseUrl.add(firebaseUrl);
+
+      return GestureDetector(
+        onTap: () async {
+          await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Viewer(
+                firebaseUrlList: listFirebaseUrl,
+                index: 0,
+              ),
+            ),
+          );
+        },
+        child: Container(
+          margin: EdgeInsets.only(top: 8),
+          child: CacheImage.firebase(
+            fit: BoxFit.fitWidth,
+            path: firebaseUrl,
+            placeholder: Container(
+              height: 150,
+              color: _themeProvider.secondBackgroundColor,
+            ),
           ),
         ),
       );
@@ -72,6 +89,7 @@ class _PostFeedState extends State<PostFeed> {
         color: _themeProvider.secondBackgroundColor,
         margin: EdgeInsets.only(top: 8),
         child: GridView.count(
+          physics: NeverScrollableScrollPhysics(),
           crossAxisCount: 4,
           mainAxisSpacing: 6,
           crossAxisSpacing: 6,

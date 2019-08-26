@@ -67,6 +67,7 @@ class UserService {
         .document(postId)
         .setData(post.toJson());
 
+    post.uid = postId;
     return post;
   }
 
