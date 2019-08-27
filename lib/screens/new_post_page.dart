@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:lynou/components/forms/loading_dialog.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/components/general/avatar.dart';
@@ -9,12 +10,13 @@ import 'package:lynou/components/general/error-dialog.dart';
 import 'package:lynou/components/image_preview.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
-import 'package:lynou/screens/utils/gallery.dart';
+import 'package:lynou/screens/utils/asset-picker/asset-picker.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:lynou/utils/compressor.dart';
+import 'package:media_picker_builder/data/media_file.dart';
 import 'package:provider/provider.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:uuid/uuid.dart';
 
 class NewPostPage extends StatefulWidget {
   @override
@@ -22,11 +24,12 @@ class NewPostPage extends StatefulWidget {
 }
 
 class _NewPostPageState extends State<NewPostPage> {
+  final navigatorKey = GlobalKey<NavigatorState>();
   TextEditingController _textController = TextEditingController();
   ThemeProvider _themeProvider;
   UserService _userService;
 
-  List<File> _fileList = List();
+  List<MediaFile> _fileList = List();
   bool _isLoading = false;
 
   /// Call the camera and retrieve the photo taken
@@ -35,21 +38,49 @@ class _NewPostPageState extends State<NewPostPage> {
     File image = await ImagePicker.pickImage(source: ImageSource.camera);
     if (image != null) {
       image = await Compressor.compressFile(image);
-      _fileList.add(image);
+
+      _fileList.add(
+          MediaFile(id: Uuid().v1(), path: image.path, type: MediaType.IMAGE));
       setState(() {});
     }
   }
 
   /// Call the Gallery and retrieve the photos
   Future _getImageFromGallery() async {
-    var assets = await Gallery.pickAssets(context, _themeProvider);
-    if (assets.isNotEmpty) {
-      for (var asset in assets) {
-        var file = await asset.file;
-        var compressedFile = await Compressor.compressFile(file);
-        _fileList.add(compressedFile);
-      }
-      setState(() {});
+    var isGranted = await AssetPicker.checkPermission();
+
+    if (isGranted) {
+      await showModalBottomSheet<Set<MediaFile>>(
+        context: navigatorKey.currentState.overlay.context,
+        builder: (BuildContext context) {
+          return AssetPicker(
+            withImages: true,
+            withVideos: true,
+            onDone: (Set<MediaFile> selectedFiles) async {
+              for (var asset in selectedFiles.toList()) {
+                if (asset.type == MediaType.IMAGE) {
+                  var image = await Compressor.compressFile(File(asset.path));
+                  _fileList.add(
+                    MediaFile(
+                      id: Uuid().v1(),
+                      path: image.path,
+                      type: MediaType.IMAGE,
+                    ),
+                  );
+                } else {
+                  _fileList.add(asset);
+                }
+              }
+
+              setState(() {});
+              Navigator.pop(context);
+            },
+            onCancel: () {
+              Navigator.pop(context);
+            },
+          );
+        },
+      );
     }
   }
 
@@ -142,7 +173,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   /// Show the preview of the file into a new page.
   /// Only supports images.
-  _onFileClicked(File file) async {
+  _onFileClicked(MediaFile file) async {
     int index = _fileList.indexOf(file);
 
     await Navigator.push(
@@ -158,7 +189,7 @@ class _NewPostPageState extends State<NewPostPage> {
 
   /// Triggers when the user click to remove the file from the list.
   /// This function removes the file from the list and rebuild.
-  _onFileRemoved(File file) {
+  _onFileRemoved(MediaFile file) {
     int index = _fileList.indexOf(file);
     _fileList.removeAt(index);
     setState(() {});
@@ -171,69 +202,72 @@ class _NewPostPageState extends State<NewPostPage> {
 
     return LoadingDialog(
       isDisplayed: _isLoading,
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            AppTranslations.of(context).text("new_post_title"),
+      child: MaterialApp(
+        navigatorKey: navigatorKey,
+        home: Scaffold(
+          appBar: AppBar(
+            title: Text(
+              AppTranslations.of(context).text("new_post_title"),
+            ),
+            leading: IconButton(
+              icon: Icon(Icons.close),
+              onPressed: () => Navigator.of(context).pop(null),
+            ),
+            centerTitle: true,
+            backgroundColor: _themeProvider.backgroundColor,
+            elevation: 0,
+            brightness: _themeProvider.setBrightness(),
           ),
-          leading: IconButton(
-            icon: Icon(Icons.close),
-            onPressed: () => Navigator.of(context).pop(null),
-          ),
-          centerTitle: true,
-          backgroundColor: _themeProvider.backgroundColor,
-          elevation: 0,
-          brightness: _themeProvider.setBrightness(),
-        ),
-        body: Container(
-          color: _themeProvider.backgroundColor,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Expanded(
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Container(
-                      margin: EdgeInsets.all(16),
-                      child: LYAvatar(),
-                    ),
-                    Expanded(
-                      child: Container(
-                        margin: EdgeInsets.only(top: 8, right: 16),
-                        child: TextField(
-                          controller: _textController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            hintText: AppTranslations.of(context)
-                                .text("new_post_hint"),
-                            hintStyle: TextStyle(
-                                color: _themeProvider.secondTextColor),
-                          ),
-                          style: TextStyle(color: _themeProvider.textColor),
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
-                          textCapitalization: TextCapitalization.sentences,
-                        ),
+          body: Container(
+            color: _themeProvider.backgroundColor,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Expanded(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Container(
+                        margin: EdgeInsets.all(16),
+                        child: LYAvatar(),
                       ),
-                    )
-                  ],
+                      Expanded(
+                        child: Container(
+                          margin: EdgeInsets.only(top: 8, right: 16),
+                          child: TextField(
+                            controller: _textController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              hintText: AppTranslations.of(context)
+                                  .text("new_post_hint"),
+                              hintStyle: TextStyle(
+                                  color: _themeProvider.secondTextColor),
+                            ),
+                            style: TextStyle(color: _themeProvider.textColor),
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            textCapitalization: TextCapitalization.sentences,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              Container(
-                margin: EdgeInsets.only(top: 8, right: 16, left: 16),
-                height: 150,
-                child: GridView.count(
-                  crossAxisCount: 4,
-                  mainAxisSpacing: 8,
-                  crossAxisSpacing: 8,
-                  children: _generatesPreviews(),
+                Container(
+                  margin: EdgeInsets.only(top: 8, right: 16, left: 16),
+                  height: 150,
+                  child: GridView.count(
+                    crossAxisCount: 4,
+                    mainAxisSpacing: 8,
+                    crossAxisSpacing: 8,
+                    children: _generatesPreviews(),
+                  ),
                 ),
-              ),
-              _displaysBottomBar(),
-            ],
+                _displaysBottomBar(),
+              ],
+            ),
           ),
         ),
       ),

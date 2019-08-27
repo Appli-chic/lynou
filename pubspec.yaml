@@ -30,8 +30,9 @@ dependencies:
   path: ^1.6.2
   path_provider: ^1.2.0
   uuid: ^2.0.2
-  photo: ^0.3.4+1
+  media_picker_builder: ^1.2.0+1
   after_layout: ^1.0.7
+  permission_handler: ^3.2.2
 
   firebase_core: ^0.4.0+8
   firebase_analytics: ^5.0.0

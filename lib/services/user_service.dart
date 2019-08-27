@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:media_picker_builder/data/media_file.dart';
 import 'package:path/path.dart';
 import 'package:lynou/models/post.dart';
 import 'package:lynou/models/user.dart';
@@ -38,7 +39,7 @@ class UserService {
   ///
   /// It sends the written [text] and is assigned to the user with the user's id
   /// If the the post also contains [files] to upload
-  Future<Post> createPost(String text, List<File> files) async {
+  Future<Post> createPost(String text, List<MediaFile> files) async {
     var user = await _auth.currentUser();
     var postId = Firestore.instance.collection('posts').document().documentID;
     List<String> fileList = [];
@@ -48,8 +49,13 @@ class UserService {
       String path = 'users/${user.uid}/posts/$postId/${basename(file.path)}';
       final StorageReference storageReference =
           FirebaseStorage().ref().child(path);
-      StorageUploadTask uploadTask = storageReference.putFile(file);
-      await uploadTask.onComplete;
+
+      if(file.type == MediaType.IMAGE) {
+        StorageUploadTask uploadTask = storageReference.putFile(File(file.path));
+        await uploadTask.onComplete;
+      } else if(file.type == MediaType.VIDEO) {
+
+      }
 
       fileList.add(basename(file.path));
     }

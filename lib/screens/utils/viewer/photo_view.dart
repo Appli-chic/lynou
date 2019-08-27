@@ -210,6 +210,7 @@ class PhotoView extends StatefulWidget {
   PhotoView({
     Key key,
     this.firebaseUrl,
+    this.videoUrl,
     this.imageProvider,
     this.loadingChild,
     this.backgroundDecoration,
@@ -258,12 +259,14 @@ class PhotoView extends StatefulWidget {
     this.onTapUp,
     this.onTapDown,
     this.firebaseUrl,
+    this.videoUrl,
   })  : loadingChild = null,
         imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
 
   final String firebaseUrl;
+  final String videoUrl;
 
   /// Given a [imageProvider] it resolves into an zoomable image widget using. It
   /// is required
@@ -386,7 +389,7 @@ class _PhotoViewState extends State<PhotoView>
   void initState() {
     super.initState();
     if (widget.child == null) {
-      if( widget.firebaseUrl == null) {
+      if( widget.firebaseUrl == null && widget.videoUrl == null) {
         _getImage();
       } else {
         _childSize = Size(100, 100);
@@ -533,6 +536,7 @@ class _PhotoViewState extends State<PhotoView>
     return PhotoViewImageWrapper(
       imageProvider: widget.imageProvider,
       firebaseUrl: widget.firebaseUrl,
+      videoUrl: widget.videoUrl,
       backgroundDecoration: widget.backgroundDecoration,
       gaplessPlayback: widget.gaplessPlayback,
       enableRotation: widget.enableRotation,

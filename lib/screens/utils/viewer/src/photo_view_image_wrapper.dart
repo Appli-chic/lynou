@@ -1,7 +1,11 @@
+import 'dart:io';
+
 import 'package:cache_image/cache_image.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
+import 'package:video_player/video_player.dart';
 
 typedef PhotoViewImageTapUpCallback = Function(BuildContext context,
     TapUpDetails details, PhotoViewControllerValue controllerValue);
@@ -14,6 +18,7 @@ class PhotoViewImageWrapper extends StatefulWidget {
   const PhotoViewImageWrapper({
     Key key,
     this.firebaseUrl,
+    this.videoUrl,
     this.imageProvider,
     this.backgroundDecoration,
     this.gaplessPlayback = false,
@@ -36,12 +41,14 @@ class PhotoViewImageWrapper extends StatefulWidget {
     this.onTapUp,
     this.onTapDown,
     this.firebaseUrl,
+    this.videoUrl,
     @required this.delegate,
   })  : imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
 
   final String firebaseUrl;
+  final String videoUrl;
   final Decoration backgroundDecoration;
   final ImageProvider imageProvider;
   final bool gaplessPlayback;
@@ -63,6 +70,8 @@ class PhotoViewImageWrapper extends StatefulWidget {
 
 class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     with TickerProviderStateMixin {
+  VideoPlayerController _videoPlayerController;
+
   Offset _normalizedPosition;
   double _scaleBefore;
   double _rotationBefore;
@@ -196,6 +205,15 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       ..addListener(handleRotationAnimation);
     widget.delegate.startListeners();
     widget.delegate.addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
+
+    // Init video player controller
+    if(widget.videoUrl != null) {
+      _videoPlayerController = VideoPlayerController.file(File(widget.videoUrl))
+        ..initialize().then((_) {
+          // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+          setState(() {});
+        });
+    }
   }
 
   void animateOnScaleStateUpdate(double prevScale, double nextScale) {
@@ -211,6 +229,11 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     _positionAnimationController.dispose();
     _rotationAnimationController.dispose();
     widget.delegate.dispose();
+
+    if(widget.videoUrl != null) {
+      _videoPlayerController.dispose();
+    }
+
     super.dispose();
   }
 
@@ -231,7 +254,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             AsyncSnapshot<PhotoViewControllerValue> snapshot) {
           if (snapshot.hasData) {
             return _buildImage(snapshot);
-          } else if(widget.firebaseUrl != null) {
+          } else if(widget.firebaseUrl != null || widget.videoUrl != null) {
             return _buildImage(snapshot);
           } else {
             return Container();
@@ -240,44 +263,50 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildImage(AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-    final PhotoViewControllerValue value = snapshot.data;
-    final matrix = Matrix4.identity()
-      ..translate(value.position.dx, value.position.dy)
-      ..scale(widget.delegate.scale);
+    if(widget.videoUrl != null) {
+      // Displays videos
+      return _buildHero();
+    } else {
+      // Displays photos
+      final PhotoViewControllerValue value = snapshot.data;
+      final matrix = Matrix4.identity()
+        ..translate(value.position.dx, value.position.dy)
+        ..scale(widget.delegate.scale);
 
-    final rotationMatrix = Matrix4.identity()..rotateZ(value.rotation);
-    final Widget customChildLayout = CustomSingleChildLayout(
-      delegate: _CenterWithOriginalSizeDelegate(
-          widget.delegate.scaleBoundaries.childSize,
-          widget.delegate.basePosition),
-      child: _buildHero(),
-    );
-    return GestureDetector(
-      child: Container(
-        child: Center(
-            child: Transform(
-              child: widget.enableRotation
-                  ? Transform(
-                child: customChildLayout,
-                transform: rotationMatrix,
-                alignment: Alignment.center,
-                origin: value.rotationFocusPoint,
-              )
-                  : customChildLayout,
-              transform: matrix,
-              alignment: widget.delegate.basePosition,
-            )),
-        decoration: widget.backgroundDecoration ??
-            const BoxDecoration(
-                color: const Color.fromRGBO(0, 0, 0, 1.0)),
-      ),
-      onDoubleTap: widget.delegate.nextScaleState,
-      onScaleStart: onScaleStart,
-      onScaleUpdate: onScaleUpdate,
-      onScaleEnd: onScaleEnd,
-      onTapUp: widget.onTapUp == null ? null : onTapUp,
-      onTapDown: widget.onTapDown == null ? null : onTapDown,
-    );
+      final rotationMatrix = Matrix4.identity()..rotateZ(value.rotation);
+      final Widget customChildLayout = CustomSingleChildLayout(
+        delegate: _CenterWithOriginalSizeDelegate(
+            widget.delegate.scaleBoundaries.childSize,
+            widget.delegate.basePosition),
+        child: _buildHero(),
+      );
+      return GestureDetector(
+        child: Container(
+          child: Center(
+              child: Transform(
+                child: widget.enableRotation
+                    ? Transform(
+                  child: customChildLayout,
+                  transform: rotationMatrix,
+                  alignment: Alignment.center,
+                  origin: value.rotationFocusPoint,
+                )
+                    : customChildLayout,
+                transform: matrix,
+                alignment: widget.delegate.basePosition,
+              )),
+          decoration: widget.backgroundDecoration ??
+              const BoxDecoration(
+                  color: const Color.fromRGBO(0, 0, 0, 1.0)),
+        ),
+        onDoubleTap: widget.delegate.nextScaleState,
+        onScaleStart: onScaleStart,
+        onScaleUpdate: onScaleUpdate,
+        onScaleEnd: onScaleEnd,
+        onTapUp: widget.onTapUp == null ? null : onTapUp,
+        onTapDown: widget.onTapDown == null ? null : onTapDown,
+      );
+    }
   }
 
   Widget _buildHero() {
@@ -291,18 +320,35 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildChild() {
-    if(widget.firebaseUrl == null) {
-      return widget.customChild == null
-          ? Image(
-        image: widget.imageProvider,
-        gaplessPlayback: widget.gaplessPlayback,
-      )
-          : widget.customChild;
-    } else {
-      return CacheImage.firebase(
-        fit: BoxFit.fitWidth,
-        path: widget.firebaseUrl,
+    if(widget.videoUrl != null) {
+      // Displays video
+      _videoPlayerController.play();
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: _videoPlayerController.value.aspectRatio,
+            child: VideoPlayer(_videoPlayerController),
+          ),
+        ),
       );
+    } else {
+      // Displays images
+      if(widget.firebaseUrl == null) {
+        // Displays local images
+        return widget.customChild == null
+            ? Image(
+          image: widget.imageProvider,
+          gaplessPlayback: widget.gaplessPlayback,
+        )
+            : widget.customChild;
+      } else {
+        // Displays firebase images
+        return CacheImage.firebase(
+          fit: BoxFit.fitWidth,
+          path: widget.firebaseUrl,
+        );
+      }
     }
   }
 }

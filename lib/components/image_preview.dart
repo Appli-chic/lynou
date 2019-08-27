@@ -1,12 +1,13 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:media_picker_builder/data/media_file.dart';
 
 class ImagePreview extends StatefulWidget {
-  final File file;
+  final MediaFile file;
   final int index;
-  final Function(File) onTap;
-  final Function(File) onRemove;
+  final Function(MediaFile) onTap;
+  final Function(MediaFile) onRemove;
 
   ImagePreview({
     @required this.file,
@@ -65,7 +66,8 @@ class _ImagePreviewState extends State<ImagePreview> {
                 constraints: BoxConstraints.expand(),
                 child: Container(
                   child: Image.file(
-                    widget.file,
+                    widget.file.type == MediaType.IMAGE ?
+                    File(widget.file.path) : File(widget.file.thumbnailPath),
                     fit: BoxFit.cover,
                   ),
                 ),

@@ -242,6 +242,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
             key: ObjectKey(index),
             imageProvider: pageOption.imageProvider,
             firebaseUrl: pageOption.firebaseUrl,
+            videoUrl: pageOption.videoUrl,
             loadingChild: widget.loadingChild,
             backgroundDecoration: widget.backgroundDecoration,
             controller: pageOption.controller,
@@ -282,6 +283,7 @@ class PhotoViewGalleryPageOptions {
   PhotoViewGalleryPageOptions(
       {Key key,
       this.firebaseUrl,
+      this.videoUrl,
       this.imageProvider,
       this.heroTag,
       this.minScale,
@@ -310,11 +312,13 @@ class PhotoViewGalleryPageOptions {
     this.onTapUp,
     this.onTapDown,
     this.firebaseUrl,
+    this.videoUrl,
   })  : imageProvider = null,
         assert(child != null),
         assert(childSize != null);
 
   final String firebaseUrl;
+  final String videoUrl;
 
   /// Mirror to [PhotoView.imageProvider]
   final ImageProvider imageProvider;

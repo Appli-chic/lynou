@@ -250,6 +250,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.5"
+  media_picker_builder:
+    dependency: "direct main"
+    description:
+      name: media_picker_builder
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0+1"
   meta:
     dependency: transitive
     description:
@@ -292,6 +299,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.7.0"
+  permission_handler:
+    dependency: "direct main"
+    description:
+      name: permission_handler
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.2.2"
   petitparser:
     dependency: transitive
     description:
@@ -299,20 +313,6 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.4.0"
-  photo:
-    dependency: "direct main"
-    description:
-      name: photo
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.4+1"
-  photo_manager:
-    dependency: transitive
-    description:
-      name: photo_manager
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.3.5"
   platform:
     dependency: transitive
     description:
