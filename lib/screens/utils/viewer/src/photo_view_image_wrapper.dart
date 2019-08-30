@@ -3,8 +3,10 @@ import 'dart:io';
 import 'package:cache_image/cache_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
+import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
 typedef PhotoViewImageTapUpCallback = Function(BuildContext context,
@@ -71,6 +73,8 @@ class PhotoViewImageWrapper extends StatefulWidget {
 class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     with TickerProviderStateMixin {
   VideoPlayerController _videoPlayerController;
+
+  ThemeProvider _themeProvider;
 
   Offset _normalizedPosition;
   double _scaleBefore;
@@ -207,12 +211,18 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     widget.delegate.addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
 
     // Init video player controller
-    if(widget.videoUrl != null) {
+    if (widget.videoUrl != null) {
       _videoPlayerController = VideoPlayerController.file(File(widget.videoUrl))
         ..initialize().then((_) {
           // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
           setState(() {});
         });
+
+      var listener = () {
+        setState(() {});
+      };
+
+      _videoPlayerController.addListener(listener);
     }
   }
 
@@ -230,7 +240,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     _rotationAnimationController.dispose();
     widget.delegate.dispose();
 
-    if(widget.videoUrl != null) {
+    if (widget.videoUrl != null) {
       _videoPlayerController.dispose();
     }
 
@@ -247,6 +257,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
 
   @override
   Widget build(BuildContext context) {
+    _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+
     return StreamBuilder(
         stream: widget.delegate.controller.outputStateStream,
         initialData: widget.delegate.controller.prevValue,
@@ -254,7 +266,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             AsyncSnapshot<PhotoViewControllerValue> snapshot) {
           if (snapshot.hasData) {
             return _buildImage(snapshot);
-          } else if(widget.firebaseUrl != null || widget.videoUrl != null) {
+          } else if (widget.firebaseUrl != null || widget.videoUrl != null) {
             return _buildImage(snapshot);
           } else {
             return Container();
@@ -263,7 +275,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildImage(AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-    if(widget.videoUrl != null) {
+    if (widget.videoUrl != null) {
       // Displays videos
       return _buildHero();
     } else {
@@ -284,20 +296,19 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
         child: Container(
           child: Center(
               child: Transform(
-                child: widget.enableRotation
-                    ? Transform(
-                  child: customChildLayout,
-                  transform: rotationMatrix,
-                  alignment: Alignment.center,
-                  origin: value.rotationFocusPoint,
-                )
-                    : customChildLayout,
-                transform: matrix,
-                alignment: widget.delegate.basePosition,
-              )),
+            child: widget.enableRotation
+                ? Transform(
+                    child: customChildLayout,
+                    transform: rotationMatrix,
+                    alignment: Alignment.center,
+                    origin: value.rotationFocusPoint,
+                  )
+                : customChildLayout,
+            transform: matrix,
+            alignment: widget.delegate.basePosition,
+          )),
           decoration: widget.backgroundDecoration ??
-              const BoxDecoration(
-                  color: const Color.fromRGBO(0, 0, 0, 1.0)),
+              const BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 1.0)),
         ),
         onDoubleTap: widget.delegate.nextScaleState,
         onScaleStart: onScaleStart,
@@ -319,28 +330,86 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
         : _buildChild();
   }
 
-  Widget _buildChild() {
-    if(widget.videoUrl != null) {
-      // Displays video
-      _videoPlayerController.play();
-      return Container(
-        color: Colors.black,
-        child: Center(
-          child: AspectRatio(
-            aspectRatio: _videoPlayerController.value.aspectRatio,
-            child: VideoPlayer(_videoPlayerController),
+  Widget _buildVideoPlayer() {
+    return Stack(
+      children: <Widget>[
+        Container(
+          color: Colors.black,
+          child: Center(
+            child: AspectRatio(
+              aspectRatio: _videoPlayerController.value.aspectRatio,
+              child: VideoPlayer(_videoPlayerController),
+            ),
           ),
         ),
-      );
+        Align(
+          alignment: Alignment.bottomLeft,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: <Widget>[
+                  Slider(
+                    onChanged: (double value) {
+                      _videoPlayerController
+                          .seekTo(Duration(milliseconds: value.toInt()));
+
+                      setState(() {});
+                    },
+                    value: _videoPlayerController
+                        .value.position.inMilliseconds
+                        .toDouble(),
+                    min: 0,
+                    max: _videoPlayerController.value.duration.inMilliseconds
+                        .toDouble(),
+                    activeColor: _themeProvider.firstColor,
+                  ),
+                  Container(
+                    margin: EdgeInsets.only(bottom: 8),
+                    child: Center(
+                      child: IconButton(
+                        onPressed: () {
+                          if (!_videoPlayerController.value.isPlaying) {
+                            _videoPlayerController.play();
+                          } else {
+                            _videoPlayerController.pause();
+                          }
+
+                          setState(() {});
+                        },
+                        icon: Icon(
+                          _videoPlayerController.value.isPlaying
+                              ? Icons.pause
+                              : Icons.play_arrow,
+                          color: Colors.white,
+                          size: 35,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildChild() {
+    if (widget.videoUrl != null) {
+      // Displays video
+      return _buildVideoPlayer();
     } else {
       // Displays images
-      if(widget.firebaseUrl == null) {
+      if (widget.firebaseUrl == null) {
         // Displays local images
         return widget.customChild == null
             ? Image(
-          image: widget.imageProvider,
-          gaplessPlayback: widget.gaplessPlayback,
-        )
+                image: widget.imageProvider,
+                gaplessPlayback: widget.gaplessPlayback,
+              )
             : widget.customChild;
       } else {
         // Displays firebase images
