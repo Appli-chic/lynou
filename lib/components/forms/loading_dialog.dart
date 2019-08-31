@@ -1,17 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:lynou/providers/theme_provider.dart';
+import 'package:provider/provider.dart';
 
-class LoadingDialog extends StatelessWidget {
+class LoadingDialog extends StatefulWidget {
   final Widget child;
   final bool isDisplayed;
 
   LoadingDialog({@required this.child, @required this.isDisplayed});
 
   @override
+  State<StatefulWidget> createState() => _LoadingDialogState();
+}
+
+class _LoadingDialogState extends State<LoadingDialog> {
+  ThemeProvider _themeProvider;
+
+  @override
   Widget build(BuildContext context) {
-    if (isDisplayed) {
+    _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+
+    if (widget.isDisplayed) {
       return Stack(
         children: <Widget>[
-          child,
+          widget.child,
           Opacity(
             child: Container(
               color: Colors.black,
@@ -30,7 +41,8 @@ class LoadingDialog extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Center(
                 child: CircularProgressIndicator(
-                  backgroundColor: Colors.red,
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(_themeProvider.firstColor),
                 ),
               ),
             ),
@@ -38,7 +50,7 @@ class LoadingDialog extends StatelessWidget {
         ],
       );
     } else {
-      return child;
+      return widget.child;
     }
   }
 }

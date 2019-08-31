@@ -67,7 +67,15 @@ class _AssetPickerState extends State<AssetPicker> {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
 
     return _loading
-        ? Center(child: CircularProgressIndicator())
+        ? Container(
+            color: _themeProvider.backgroundColor,
+            child: Center(
+              child: CircularProgressIndicator(
+                valueColor:
+                    AlwaysStoppedAnimation<Color>(_themeProvider.firstColor),
+              ),
+            ),
+          )
         : _buildWidget();
   }
 
@@ -76,9 +84,8 @@ class _AssetPickerState extends State<AssetPicker> {
       return Center(child: Text("You have no folders to select from"));
 
     final dropDownAlbumsWidget = Theme(
-      data: Theme.of(context).copyWith(
-        canvasColor: _themeProvider.backgroundColor
-      ),
+      data: Theme.of(context)
+          .copyWith(canvasColor: _themeProvider.backgroundColor),
       child: DropdownButton<Album>(
         value: _selectedAlbum,
         onChanged: (Album newValue) {
