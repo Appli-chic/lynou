@@ -25,7 +25,7 @@ class _LoadingDialogState extends State<LoadingDialog> {
           widget.child,
           Opacity(
             child: Container(
-              color: Colors.black,
+              color: _themeProvider.backgroundColor,
               child: ModalBarrier(dismissible: false),
             ),
             opacity: 0.3,
@@ -33,7 +33,7 @@ class _LoadingDialogState extends State<LoadingDialog> {
           Center(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: _themeProvider.secondBackgroundColor,
                 borderRadius: BorderRadius.circular(12),
               ),
               width: 100,

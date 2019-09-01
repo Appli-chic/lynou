@@ -75,13 +75,6 @@ class _ViewerState extends State<Viewer> {
               itemCount: widget.files.length,
               pageController: _pageController,
             ),
-            ConstrainedBox(
-              constraints: BoxConstraints.loose(Size(double.infinity, kToolbarHeight)),
-              child: AppBar(
-                backgroundColor: Colors.transparent,
-                elevation: 0,
-              ),
-            ),
           ],
         ),
       );
@@ -90,10 +83,6 @@ class _ViewerState extends State<Viewer> {
     // Display assets from firebase images
     if(widget.firebaseUrlList != null) {
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.black,
-          elevation: 0,
-        ),
         body: Stack(
           children: <Widget>[
             PhotoViewGallery.builder(

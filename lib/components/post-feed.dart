@@ -20,7 +20,7 @@ class PostFeed extends StatefulWidget {
   _PostFeedState createState() => _PostFeedState();
 }
 
-class _PostFeedState extends State<PostFeed> {
+class _PostFeedState extends State<PostFeed> with AutomaticKeepAliveClientMixin {
   ThemeProvider _themeProvider;
 
   /// Displays photos an videos linked to the post
@@ -210,4 +210,7 @@ class _PostFeedState extends State<PostFeed> {
       ],
     );
   }
+
+  @override
+  bool get wantKeepAlive => true;
 }

@@ -73,6 +73,7 @@ class PhotoViewImageWrapper extends StatefulWidget {
 class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     with TickerProviderStateMixin {
   VideoPlayerController _videoPlayerController;
+  bool _isOverlayVisible = true;
 
   ThemeProvider _themeProvider;
 
@@ -219,6 +220,16 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
         });
 
       var listener = () {
+        if (_videoPlayerController.value.position ==
+            _videoPlayerController.value.duration) {
+          _videoPlayerController.pause();
+          _videoPlayerController.seekTo(Duration(milliseconds: 0));
+
+          setState(() {
+            _isOverlayVisible = true;
+          });
+        }
+
         setState(() {});
       };
 
@@ -255,69 +266,160 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     widget.onTapDown(context, details, widget.delegate.controller.value);
   }
 
+  Widget _displaysOverlay() {
+    if (_isOverlayVisible) {
+      if (widget.videoUrl != null && _videoPlayerController != null) {
+        Widget videoOverlay = Material(
+          color: Colors.black26,
+          child: Container(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: <Widget>[
+                ConstrainedBox(
+                  constraints: BoxConstraints.loose(
+                      Size(double.infinity, kToolbarHeight)),
+                  child: AppBar(
+                    backgroundColor: Colors.transparent,
+                    elevation: 0,
+                  ),
+                ),
+                Center(
+                  child: IconButton(
+                    onPressed: () {
+                      if (!_videoPlayerController.value.isPlaying) {
+                        _videoPlayerController.play();
+                      } else {
+                        _videoPlayerController.pause();
+                      }
+
+                      setState(() {});
+                    },
+                    icon: Icon(
+                      _videoPlayerController.value.isPlaying
+                          ? Icons.pause
+                          : Icons.play_arrow,
+                      color: Colors.white,
+                    ),
+                    iconSize: 50,
+                  ),
+                ),
+                Container(
+                  margin: EdgeInsets.all(12),
+                  child: Slider(
+                    onChanged: (double value) {
+                      _videoPlayerController
+                          .seekTo(Duration(milliseconds: value.toInt()));
+
+                      setState(() {});
+                    },
+                    value: _videoPlayerController.value.position.inMilliseconds
+                        .toDouble(),
+                    min: 0,
+                    max: _videoPlayerController.value.duration != null
+                        ? _videoPlayerController.value.duration.inMilliseconds
+                            .toDouble()
+                        : 0,
+                    activeColor: _themeProvider.firstColor,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+
+        return videoOverlay;
+      } else {
+        Widget photoOverlay = Material(
+          color: Colors.black26,
+          child: ConstrainedBox(
+            constraints:
+                BoxConstraints.loose(Size(double.infinity, kToolbarHeight)),
+            child: AppBar(
+              backgroundColor: Colors.transparent,
+              elevation: 0,
+            ),
+          ),
+        );
+
+        return photoOverlay;
+      }
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
 
-    return StreamBuilder(
-        stream: widget.delegate.controller.outputStateStream,
-        initialData: widget.delegate.controller.prevValue,
-        builder: (BuildContext context,
-            AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-          if (snapshot.hasData) {
-            return _buildImage(snapshot);
-          } else if (widget.firebaseUrl != null || widget.videoUrl != null) {
-            return _buildImage(snapshot);
-          } else {
-            return Container();
-          }
+    return GestureDetector(
+      onTap: () {
+        this.setState(() {
+          _isOverlayVisible = !_isOverlayVisible;
         });
+      },
+      child: Stack(
+        children: <Widget>[
+          StreamBuilder(
+              stream: widget.delegate.controller.outputStateStream,
+              initialData: widget.delegate.controller.prevValue,
+              builder: (BuildContext context,
+                  AsyncSnapshot<PhotoViewControllerValue> snapshot) {
+                if (snapshot.hasData) {
+                  return _buildImage(snapshot);
+                } else if (widget.firebaseUrl != null) {
+                  return _buildImage(snapshot);
+                } else if (widget.videoUrl != null) {
+                  return _buildHero();
+                } else {
+                  return Container();
+                }
+              }),
+          _displaysOverlay(),
+        ],
+      ),
+    );
   }
 
   Widget _buildImage(AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-    if (widget.videoUrl != null) {
-      // Displays videos
-      return _buildHero();
-    } else {
-      // Displays photos
-      final PhotoViewControllerValue value = snapshot.data;
-      final matrix = Matrix4.identity()
-        ..translate(value.position.dx, value.position.dy)
-        ..scale(widget.delegate.scale);
+    // Displays photos
+    final PhotoViewControllerValue value = snapshot.data;
+    final matrix = Matrix4.identity()
+      ..translate(value.position.dx, value.position.dy)
+      ..scale(widget.delegate.scale);
 
-      final rotationMatrix = Matrix4.identity()..rotateZ(value.rotation);
-      final Widget customChildLayout = CustomSingleChildLayout(
-        delegate: _CenterWithOriginalSizeDelegate(
-            widget.delegate.scaleBoundaries.childSize,
-            widget.delegate.basePosition),
-        child: _buildHero(),
-      );
-      return GestureDetector(
-        child: Container(
-          child: Center(
-              child: Transform(
-            child: widget.enableRotation
-                ? Transform(
-                    child: customChildLayout,
-                    transform: rotationMatrix,
-                    alignment: Alignment.center,
-                    origin: value.rotationFocusPoint,
-                  )
-                : customChildLayout,
-            transform: matrix,
-            alignment: widget.delegate.basePosition,
-          )),
-          decoration: widget.backgroundDecoration ??
-              const BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 1.0)),
-        ),
-        onDoubleTap: widget.delegate.nextScaleState,
-        onScaleStart: onScaleStart,
-        onScaleUpdate: onScaleUpdate,
-        onScaleEnd: onScaleEnd,
-        onTapUp: widget.onTapUp == null ? null : onTapUp,
-        onTapDown: widget.onTapDown == null ? null : onTapDown,
-      );
-    }
+    final rotationMatrix = Matrix4.identity()..rotateZ(value.rotation);
+    final Widget customChildLayout = CustomSingleChildLayout(
+      delegate: _CenterWithOriginalSizeDelegate(
+          widget.delegate.scaleBoundaries.childSize,
+          widget.delegate.basePosition),
+      child: _buildHero(),
+    );
+    return GestureDetector(
+      child: Container(
+        child: Center(
+            child: Transform(
+          child: widget.enableRotation
+              ? Transform(
+                  child: customChildLayout,
+                  transform: rotationMatrix,
+                  alignment: Alignment.center,
+                  origin: value.rotationFocusPoint,
+                )
+              : customChildLayout,
+          transform: matrix,
+          alignment: widget.delegate.basePosition,
+        )),
+        decoration: widget.backgroundDecoration ??
+            const BoxDecoration(color: const Color.fromRGBO(0, 0, 0, 1.0)),
+      ),
+      onDoubleTap: widget.delegate.nextScaleState,
+      onScaleStart: onScaleStart,
+      onScaleUpdate: onScaleUpdate,
+      onScaleEnd: onScaleEnd,
+      onTapUp: widget.onTapUp == null ? null : onTapUp,
+      onTapDown: widget.onTapDown == null ? null : onTapDown,
+    );
   }
 
   Widget _buildHero() {
@@ -331,69 +433,14 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildVideoPlayer() {
-    return Stack(
-      children: <Widget>[
-        Container(
-          color: Colors.black,
-          child: Center(
-            child: AspectRatio(
-              aspectRatio: _videoPlayerController.value.aspectRatio,
-              child: VideoPlayer(_videoPlayerController),
-            ),
-          ),
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: AspectRatio(
+          aspectRatio: _videoPlayerController.value.aspectRatio,
+          child: VideoPlayer(_videoPlayerController),
         ),
-        Align(
-          alignment: Alignment.bottomLeft,
-          child: Material(
-            color: Colors.transparent,
-            child: Container(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: <Widget>[
-                  Slider(
-                    onChanged: (double value) {
-                      _videoPlayerController
-                          .seekTo(Duration(milliseconds: value.toInt()));
-
-                      setState(() {});
-                    },
-                    value: _videoPlayerController
-                        .value.position.inMilliseconds
-                        .toDouble(),
-                    min: 0,
-                    max: _videoPlayerController.value.duration.inMilliseconds
-                        .toDouble(),
-                    activeColor: _themeProvider.firstColor,
-                  ),
-                  Container(
-                    margin: EdgeInsets.only(bottom: 8),
-                    child: Center(
-                      child: IconButton(
-                        onPressed: () {
-                          if (!_videoPlayerController.value.isPlaying) {
-                            _videoPlayerController.play();
-                          } else {
-                            _videoPlayerController.pause();
-                          }
-
-                          setState(() {});
-                        },
-                        icon: Icon(
-                          _videoPlayerController.value.isPlaying
-                              ? Icons.pause
-                              : Icons.play_arrow,
-                          color: Colors.white,
-                          size: 35,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ],
+      ),
     );
   }
 
@@ -413,9 +460,11 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             : widget.customChild;
       } else {
         // Displays firebase images
-        return CacheImage.firebase(
-          fit: BoxFit.fitWidth,
-          path: widget.firebaseUrl,
+        return Center(
+          child: CacheImage.firebase(
+            fit: BoxFit.fitWidth,
+            path: widget.firebaseUrl,
+          ),
         );
       }
     }

@@ -80,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> with AutomaticKeepAliveClientMi
       body: Container(
         color: _themeProvider.backgroundColor,
         child: ListView.separated(
+          addAutomaticKeepAlives: true,
           itemCount: _postList.length,
           itemBuilder: (context, index) {
             return Container(
