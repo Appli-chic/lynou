@@ -50,6 +50,17 @@ class _ImagePreviewState extends State<ImagePreview> {
     }
   }
 
+  /// Displays the video icon if the media is a video
+  _displaysVideoIcon() {
+    if (widget.file.type == MediaType.VIDEO) {
+      return Center(
+        child: Icon(Icons.play_circle_filled, color: Colors.white),
+      );
+    } else {
+      return Container();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Hero(
@@ -66,13 +77,15 @@ class _ImagePreviewState extends State<ImagePreview> {
                 constraints: BoxConstraints.expand(),
                 child: Container(
                   child: Image.file(
-                    widget.file.type == MediaType.IMAGE ?
-                    File(widget.file.path) : File(widget.file.thumbnailPath),
+                    widget.file.type == MediaType.IMAGE
+                        ? File(widget.file.path)
+                        : File(widget.file.thumbnailPath),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
               _displaysDeleteIcon(),
+              _displaysVideoIcon(),
             ],
           ),
         ),

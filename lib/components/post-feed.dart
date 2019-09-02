@@ -6,6 +6,7 @@ import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/models/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
+import 'package:lynou/utils/image.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -20,7 +21,8 @@ class PostFeed extends StatefulWidget {
   _PostFeedState createState() => _PostFeedState();
 }
 
-class _PostFeedState extends State<PostFeed> with AutomaticKeepAliveClientMixin {
+class _PostFeedState extends State<PostFeed>
+    with AutomaticKeepAliveClientMixin {
   ThemeProvider _themeProvider;
 
   /// Displays photos an videos linked to the post
@@ -35,7 +37,8 @@ class _PostFeedState extends State<PostFeed> with AutomaticKeepAliveClientMixin 
     // Displays only one media
     if (widget.post.fileList != null && widget.post.fileList.length == 1) {
       var listFirebaseUrl = List<String>();
-      var firebaseUrl = 'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}';
+      var firebaseUrl =
+          'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}';
       listFirebaseUrl.add(firebaseUrl);
 
       return GestureDetector(
@@ -54,7 +57,7 @@ class _PostFeedState extends State<PostFeed> with AutomaticKeepAliveClientMixin 
           margin: EdgeInsets.only(top: 8),
           child: CacheImage.firebase(
             fit: BoxFit.fitWidth,
-            path: firebaseUrl,
+            path: ImageUtils.displaysThumbnails(firebaseUrl),
             placeholder: Container(
               height: 150,
               color: _themeProvider.secondBackgroundColor,
@@ -66,20 +69,42 @@ class _PostFeedState extends State<PostFeed> with AutomaticKeepAliveClientMixin 
         widget.post.fileList.length > 1) {
       // Displays more than one media
       List<Widget> listAssets = [];
-
+      var listFirebaseUrl = List<String>();
       final size = MediaQuery.of(context).size;
 
       for (var file in widget.post.fileList) {
+        var firebaseUrl =
+            'users/${widget.post.userId}/posts/${widget.post.uid}/$file';
+        listFirebaseUrl.add(firebaseUrl);
+      }
+
+      for (var file in widget.post.fileList) {
+        int index = widget.post.fileList.indexOf(file);
+
         listAssets.add(
-          CacheImage.firebase(
-            fit: BoxFit.cover,
-            width: (size.width - 32 / 4),
-            height: 100,
-            path: 'users/${widget.post.userId}/posts/${widget.post.uid}/$file',
-            placeholder: Container(
+          GestureDetector(
+            onTap: () async {
+              await Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => Viewer(
+                    firebaseUrlList: listFirebaseUrl,
+                    index: index,
+                  ),
+                ),
+              );
+            },
+            child: CacheImage.firebase(
+              fit: BoxFit.cover,
               width: (size.width - 32 / 4),
               height: 100,
-              color: _themeProvider.secondBackgroundColor,
+              path: ImageUtils.displaysThumbnails(
+                  'users/${widget.post.userId}/posts/${widget.post.uid}/$file'),
+              placeholder: Container(
+                width: (size.width - 32 / 4),
+                height: 100,
+                color: _themeProvider.secondBackgroundColor,
+              ),
             ),
           ),
         );

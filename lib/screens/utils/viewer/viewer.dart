@@ -38,7 +38,7 @@ class _ViewerState extends State<Viewer> {
   }
 
   @override
-  dispose(){
+  dispose() {
     _pageController.dispose();
     SystemChrome.setPreferredOrientations([
       DeviceOrientation.portraitUp,
@@ -50,54 +50,48 @@ class _ViewerState extends State<Viewer> {
   @override
   Widget build(BuildContext context) {
     // Display assets from actual files
-    if(widget.files != null) {
+    if (widget.files != null) {
       return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            PhotoViewGallery.builder(
-              scrollPhysics: const BouncingScrollPhysics(),
-              builder: (BuildContext context, int index) {
-                // Displays images
-                if(widget.files[index].type == MediaType.IMAGE) {
-                  return PhotoViewGalleryPageOptions(
-                    imageProvider: Image.file(File(widget.files[index].path)).image,
-                    initialScale: PhotoViewComputedScale.contained,
-                    heroTag: widget.files.indexOf(widget.files[index]),
-                  );
-                } else {
-                  return PhotoViewGalleryPageOptions(
-                    videoUrl: widget.files[index].path,
-                    initialScale: PhotoViewComputedScale.contained,
-                    heroTag: widget.files.indexOf(widget.files[index]),
-                  );
-                }
-              },
-              itemCount: widget.files.length,
-              pageController: _pageController,
-            ),
-          ],
+        body: PhotoViewGallery.builder(
+          scrollPhysics: const BouncingScrollPhysics(),
+          builder: (BuildContext context, int index) {
+            // Displays images
+            if (widget.files[index].type == MediaType.IMAGE) {
+              return PhotoViewGalleryPageOptions(
+                imageProvider:
+                Image.file(File(widget.files[index].path)).image,
+                initialScale: PhotoViewComputedScale.contained,
+                heroTag: widget.files.indexOf(widget.files[index]),
+              );
+            } else {
+              return PhotoViewGalleryPageOptions(
+                videoUrl: widget.files[index].path,
+                initialScale: PhotoViewComputedScale.contained,
+                heroTag: widget.files.indexOf(widget.files[index]),
+              );
+            }
+          },
+          itemCount: widget.files.length,
+          pageController: _pageController,
         ),
       );
     }
 
     // Display assets from firebase images
-    if(widget.firebaseUrlList != null) {
+    if (widget.firebaseUrlList != null) {
       return Scaffold(
-        body: Stack(
-          children: <Widget>[
-            PhotoViewGallery.builder(
-              scrollPhysics: const BouncingScrollPhysics(),
-              builder: (BuildContext context, int index) {
-                return PhotoViewGalleryPageOptions(
-                  firebaseUrl: widget.firebaseUrlList[index],
-                  initialScale: PhotoViewComputedScale.contained,
-                  heroTag: widget.firebaseUrlList.indexOf(widget.firebaseUrlList[index]),
-                );
-              },
-              itemCount: widget.firebaseUrlList.length,
-              pageController: _pageController,
-            ),
-          ],
+        body: PhotoViewGallery.builder(
+          scrollPhysics: const BouncingScrollPhysics(),
+          builder: (BuildContext context, int index) {
+            return PhotoViewGalleryPageOptions(
+              firebaseUrl: widget.firebaseUrlList[index],
+              initialScale: PhotoViewComputedScale.contained,
+              heroTag:
+                  widget.firebaseUrlList.indexOf(widget.firebaseUrlList[index]),
+            );
+          },
+          itemCount: widget.firebaseUrlList.length,
+          pageController: _pageController,
         ),
       );
     }

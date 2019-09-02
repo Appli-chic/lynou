@@ -50,11 +50,17 @@ class UserService {
       final StorageReference storageReference =
           FirebaseStorage().ref().child(path);
 
-      if(file.type == MediaType.IMAGE) {
-        StorageUploadTask uploadTask = storageReference.putFile(File(file.path));
-        await uploadTask.onComplete;
-      } else if(file.type == MediaType.VIDEO) {
+      StorageUploadTask uploadTask = storageReference.putFile(File(file.path));
+      await uploadTask.onComplete;
 
+      // Upload thumbnails
+      if(file.type == MediaType.VIDEO) {
+        var fileName = basenameWithoutExtension(file.path) + ".jpg";
+        String path = 'users/${user.uid}/posts/$postId/$fileName';
+        final StorageReference thumbnailStorageReference =
+        FirebaseStorage().ref().child(path);
+        StorageUploadTask thumbnailUploadTask = thumbnailStorageReference.putFile(File(file.thumbnailPath));
+        await thumbnailUploadTask.onComplete;
       }
 
       fileList.add(basename(file.path));

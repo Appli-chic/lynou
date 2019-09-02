@@ -392,7 +392,7 @@ class _PhotoViewState extends State<PhotoView>
       if( widget.firebaseUrl == null && widget.videoUrl == null) {
         _getImage();
       } else {
-        _childSize = Size(100, 100);
+        _childSize = Size(100, 200);
         _loading = false;
       }
     } else {

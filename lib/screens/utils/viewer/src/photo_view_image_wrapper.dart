@@ -1,11 +1,13 @@
 import 'dart:io';
 
 import 'package:cache_image/cache_image.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
+import 'package:lynou/utils/image.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -73,7 +75,8 @@ class PhotoViewImageWrapper extends StatefulWidget {
 class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     with TickerProviderStateMixin {
   VideoPlayerController _videoPlayerController;
-  bool _isOverlayVisible = true;
+  bool _isOverlayVisible = false;
+  bool _isVideoLoading = true;
 
   ThemeProvider _themeProvider;
 
@@ -212,28 +215,47 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     widget.delegate.addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
 
     // Init video player controller
+    var listener = () {
+      if (_videoPlayerController.value.position ==
+          _videoPlayerController.value.duration) {
+        _videoPlayerController.pause();
+        _videoPlayerController.seekTo(Duration(milliseconds: 0));
+
+        setState(() {
+          _isOverlayVisible = true;
+        });
+      }
+
+      setState(() {});
+    };
+
     if (widget.videoUrl != null) {
+      _isOverlayVisible = true;
       _videoPlayerController = VideoPlayerController.file(File(widget.videoUrl))
         ..initialize().then((_) {
           // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+          _isVideoLoading = false;
           setState(() {});
         });
 
-      var listener = () {
-        if (_videoPlayerController.value.position ==
-            _videoPlayerController.value.duration) {
-          _videoPlayerController.pause();
-          _videoPlayerController.seekTo(Duration(milliseconds: 0));
-
-          setState(() {
-            _isOverlayVisible = true;
-          });
-        }
-
-        setState(() {});
-      };
-
       _videoPlayerController.addListener(listener);
+    }
+
+    if (widget.firebaseUrl != null) {
+      if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+        _isOverlayVisible = true;
+        var ref = FirebaseStorage.instance.ref().child(widget.firebaseUrl);
+        ref.getDownloadURL().then((url) {
+          _videoPlayerController = VideoPlayerController.network(url)
+            ..initialize().then((_) {
+              // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+              _isVideoLoading = false;
+              setState(() {});
+            });
+
+          _videoPlayerController.addListener(listener);
+        });
+      }
     }
   }
 
@@ -266,62 +288,70 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     widget.onTapDown(context, details, widget.delegate.controller.value);
   }
 
+  /// Displays overlay for images and photos
   Widget _displaysOverlay() {
     if (_isOverlayVisible) {
-      if (widget.videoUrl != null && _videoPlayerController != null) {
+      if ((widget.videoUrl != null ||
+          (widget.firebaseUrl != null &&
+              ImageUtils.checkIfIsVideo(widget.firebaseUrl)))) {
         Widget videoOverlay = Material(
           color: Colors.black26,
           child: Container(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-                ConstrainedBox(
-                  constraints: BoxConstraints.loose(
-                      Size(double.infinity, kToolbarHeight)),
-                  child: AppBar(
-                    backgroundColor: Colors.transparent,
-                    elevation: 0,
-                  ),
+                AppBar(
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
                 ),
-                Center(
-                  child: IconButton(
-                    onPressed: () {
-                      if (!_videoPlayerController.value.isPlaying) {
-                        _videoPlayerController.play();
-                      } else {
-                        _videoPlayerController.pause();
-                      }
+                _isVideoLoading
+                    ? CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                            _themeProvider.firstColor),
+                      )
+                    : Center(
+                        child: IconButton(
+                          onPressed: () {
+                            if (!_videoPlayerController.value.isPlaying) {
+                              _videoPlayerController.play();
+                            } else {
+                              _videoPlayerController.pause();
+                            }
 
-                      setState(() {});
-                    },
-                    icon: Icon(
-                      _videoPlayerController.value.isPlaying
-                          ? Icons.pause
-                          : Icons.play_arrow,
-                      color: Colors.white,
-                    ),
-                    iconSize: 50,
-                  ),
-                ),
-                Container(
-                  margin: EdgeInsets.all(12),
-                  child: Slider(
-                    onChanged: (double value) {
-                      _videoPlayerController
-                          .seekTo(Duration(milliseconds: value.toInt()));
+                            setState(() {});
+                          },
+                          icon: Icon(
+                            _videoPlayerController.value.isPlaying
+                                ? Icons.pause
+                                : Icons.play_arrow,
+                            color: Colors.white,
+                          ),
+                          iconSize: 50,
+                        ),
+                      ),
+                _isVideoLoading
+                    ? Container()
+                    : Container(
+                        margin: EdgeInsets.all(12),
+                        child: Slider(
+                          onChanged: (double value) {
+                            _videoPlayerController
+                                .seekTo(Duration(milliseconds: value.toInt()));
 
-                      setState(() {});
-                    },
-                    value: _videoPlayerController.value.position.inMilliseconds
-                        .toDouble(),
-                    min: 0,
-                    max: _videoPlayerController.value.duration != null
-                        ? _videoPlayerController.value.duration.inMilliseconds
-                            .toDouble()
-                        : 0,
-                    activeColor: _themeProvider.firstColor,
-                  ),
-                ),
+                            setState(() {});
+                          },
+                          value: _videoPlayerController
+                              .value.position.inMilliseconds
+                              .toDouble(),
+                          min: 0,
+                          max: _videoPlayerController.value.duration != null
+                              ? _videoPlayerController
+                                  .value.duration.inMilliseconds
+                                  .toDouble()
+                              : 0,
+                          activeColor: _themeProvider.firstColor,
+                        ),
+                      ),
               ],
             ),
           ),
@@ -331,13 +361,9 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       } else {
         Widget photoOverlay = Material(
           color: Colors.black26,
-          child: ConstrainedBox(
-            constraints:
-                BoxConstraints.loose(Size(double.infinity, kToolbarHeight)),
-            child: AppBar(
-              backgroundColor: Colors.transparent,
-              elevation: 0,
-            ),
+          child: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
           ),
         );
 
@@ -433,15 +459,19 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildVideoPlayer() {
-    return Container(
-      color: Colors.black,
-      child: Center(
-        child: AspectRatio(
-          aspectRatio: _videoPlayerController.value.aspectRatio,
-          child: VideoPlayer(_videoPlayerController),
+    if (!_isVideoLoading) {
+      return Container(
+        color: Colors.black,
+        child: Center(
+          child: AspectRatio(
+            aspectRatio: _videoPlayerController.value.aspectRatio,
+            child: VideoPlayer(_videoPlayerController),
+          ),
         ),
-      ),
-    );
+      );
+    } else {
+      return Container();
+    }
   }
 
   Widget _buildChild() {
@@ -460,12 +490,18 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             : widget.customChild;
       } else {
         // Displays firebase images
-        return Center(
-          child: CacheImage.firebase(
-            fit: BoxFit.fitWidth,
-            path: widget.firebaseUrl,
-          ),
-        );
+        if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+          // Displays videos
+          return _buildVideoPlayer();
+        } else {
+          // Displays photos
+          return Center(
+            child: CacheImage.firebase(
+              fit: BoxFit.fitWidth,
+              path: widget.firebaseUrl,
+            ),
+          );
+        }
       }
     }
   }
