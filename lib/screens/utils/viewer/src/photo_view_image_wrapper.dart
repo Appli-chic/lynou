@@ -305,10 +305,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
                   elevation: 0,
                 ),
                 _isVideoLoading
-                    ? CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                            _themeProvider.firstColor),
-                      )
+                    ? Container()
                     : Center(
                         child: IconButton(
                           onPressed: () {
@@ -332,7 +329,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
                 _isVideoLoading
                     ? Container()
                     : Container(
-                        margin: EdgeInsets.all(12),
+                        margin: EdgeInsets.only(left: 12, right: 12, bottom: 16),
                         child: Slider(
                           onChanged: (double value) {
                             _videoPlayerController
@@ -391,12 +388,16 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
               initialData: widget.delegate.controller.prevValue,
               builder: (BuildContext context,
                   AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-                if (snapshot.hasData) {
-                  return _buildImage(snapshot);
-                } else if (widget.firebaseUrl != null) {
-                  return _buildImage(snapshot);
+                if (widget.firebaseUrl != null) {
+                  if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+                    return _buildHero();
+                  } else {
+                    return _buildImage(snapshot);
+                  }
                 } else if (widget.videoUrl != null) {
                   return _buildHero();
+                } else if (snapshot.hasData) {
+                  return _buildImage(snapshot);
                 } else {
                   return Container();
                 }
@@ -470,7 +471,17 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
         ),
       );
     } else {
-      return Container();
+      return Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: Colors.black,
+        child: Center(
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(
+                _themeProvider.firstColor),
+          ),
+        ),
+      );
     }
   }
 

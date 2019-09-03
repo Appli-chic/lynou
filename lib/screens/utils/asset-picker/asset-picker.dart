@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/asset-picker/gallery_widget.dart';
 import 'package:lynou/screens/utils/asset-picker/multi_selector_model.dart';
@@ -15,12 +16,14 @@ class AssetPicker extends StatefulWidget {
   final bool withVideos;
   final Function(Set<MediaFile> selectedFiles) onDone;
   final Function() onCancel;
+  final AppTranslations appTranslations;
 
   AssetPicker({
     @required this.withImages,
     @required this.withVideos,
     @required this.onDone,
     @required this.onCancel,
+    @required this.appTranslations,
   });
 
   static Future<bool> checkPermission() async {
@@ -81,7 +84,7 @@ class _AssetPickerState extends State<AssetPicker> {
 
   _buildWidget() {
     if (_albums.isEmpty)
-      return Center(child: Text("You have no folders to select from"));
+      return Center(child: Text(widget.appTranslations.text("asset_picker_no_folders")));
 
     final dropDownAlbumsWidget = Theme(
       data: Theme.of(context)
@@ -126,7 +129,7 @@ class _AssetPickerState extends State<AssetPicker> {
                     padding: EdgeInsets.only(left: 8),
                     textColor: Colors.white,
                     onPressed: () => widget.onCancel(),
-                    child: Text("Cancel"),
+                    child: Text(widget.appTranslations.text("cancel")),
                   ),
                 ),
                 dropDownAlbumsWidget,
@@ -135,11 +138,10 @@ class _AssetPickerState extends State<AssetPicker> {
                     return ConstrainedBox(
                       constraints: BoxConstraints(maxWidth: 70),
                       child: FlatButton(
-                        padding: EdgeInsets.only(right: 8),
                         textColor: _themeProvider.firstColor,
                         onPressed: () => widget.onDone(_selector.selectedItems),
                         child: Text(
-                          "Done (${selector.selectedItems.length})",
+                          "(${selector.selectedItems.length})",
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

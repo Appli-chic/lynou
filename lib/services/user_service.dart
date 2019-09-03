@@ -90,6 +90,7 @@ class UserService {
     var query = await Firestore.instance
         .collection('posts')
         .where('userId', isEqualTo: user.uid)
+        .limit(10)
         .orderBy('updatedAt', descending: true)
         .getDocuments(source: source);
 

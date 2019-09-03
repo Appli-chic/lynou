@@ -30,7 +30,7 @@ dependencies:
   path: ^1.6.2
   path_provider: ^1.2.0
   uuid: ^2.0.2
-  media_picker_builder: ^1.2.0+1
+  media_picker_builder: ^1.2.0+2
   after_layout: ^1.0.7
   permission_handler: ^3.2.2
   mime_type: ^0.2.4

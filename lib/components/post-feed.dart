@@ -53,16 +53,33 @@ class _PostFeedState extends State<PostFeed>
             ),
           );
         },
-        child: Container(
-          margin: EdgeInsets.only(top: 8),
-          child: CacheImage.firebase(
-            fit: BoxFit.fitWidth,
-            path: ImageUtils.displaysThumbnails(firebaseUrl),
-            placeholder: Container(
-              height: 150,
-              color: _themeProvider.secondBackgroundColor,
+        child: Stack(
+          alignment: Alignment.center,
+          children: <Widget>[
+            Container(
+              margin: EdgeInsets.only(top: 8),
+              child: CacheImage.firebase(
+                fit: BoxFit.fitWidth,
+                path: ImageUtils.displaysThumbnails(firebaseUrl),
+                placeholder: Container(
+                  height: 150,
+                  color: _themeProvider.secondBackgroundColor,
+                ),
+              ),
             ),
-          ),
+            ImageUtils.checkIfIsVideo(firebaseUrl)
+                ? Container(
+                    margin: EdgeInsets.only(top: 8),
+                    child: Center(
+                      child: Icon(
+                        Icons.play_circle_filled,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
+                  )
+                : Container(),
+          ],
         ),
       );
     } else if (widget.post.fileList != null &&
@@ -70,7 +87,6 @@ class _PostFeedState extends State<PostFeed>
       // Displays more than one media
       List<Widget> listAssets = [];
       var listFirebaseUrl = List<String>();
-      final size = MediaQuery.of(context).size;
 
       for (var file in widget.post.fileList) {
         var firebaseUrl =
@@ -78,36 +94,20 @@ class _PostFeedState extends State<PostFeed>
         listFirebaseUrl.add(firebaseUrl);
       }
 
+      int crossAxisCount = 4;
+      if (widget.post.fileList.length < 4) {
+        crossAxisCount = widget.post.fileList.length;
+      }
+
       for (var file in widget.post.fileList) {
         int index = widget.post.fileList.indexOf(file);
 
-        listAssets.add(
-          GestureDetector(
-            onTap: () async {
-              await Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => Viewer(
-                    firebaseUrlList: listFirebaseUrl,
-                    index: index,
-                  ),
-                ),
-              );
-            },
-            child: CacheImage.firebase(
-              fit: BoxFit.cover,
-              width: (size.width - 32 / 4),
-              height: 100,
-              path: ImageUtils.displaysThumbnails(
-                  'users/${widget.post.userId}/posts/${widget.post.uid}/$file'),
-              placeholder: Container(
-                width: (size.width - 32 / 4),
-                height: 100,
-                color: _themeProvider.secondBackgroundColor,
-              ),
-            ),
-          ),
-        );
+        if (index < 4) {
+          listAssets.add(_displayAssetForGrid(
+              'users/${widget.post.userId}/posts/${widget.post.uid}/$file',
+              index,
+              listFirebaseUrl));
+        }
       }
 
       return Container(
@@ -115,7 +115,7 @@ class _PostFeedState extends State<PostFeed>
         margin: EdgeInsets.only(top: 8),
         child: GridView.count(
           physics: NeverScrollableScrollPhysics(),
-          crossAxisCount: 4,
+          crossAxisCount: crossAxisCount,
           mainAxisSpacing: 6,
           crossAxisSpacing: 6,
           shrinkWrap: true,
@@ -125,6 +125,63 @@ class _PostFeedState extends State<PostFeed>
     }
 
     return Container();
+  }
+
+  /// Displays photos and videos for the grid in case of a post with many
+  /// images or videos.
+  Widget _displayAssetForGrid(
+      String firebaseUrl, int index, List<String> listFirebaseUrl) {
+    return GestureDetector(
+      onTap: () async {
+        await Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => Viewer(
+              firebaseUrlList: listFirebaseUrl,
+              index: index,
+            ),
+          ),
+        );
+      },
+      child: Stack(
+        children: <Widget>[
+          CacheImage.firebase(
+            fit: BoxFit.cover,
+            width: double.infinity,
+            height: double.infinity,
+            path: ImageUtils.displaysThumbnails(firebaseUrl),
+            placeholder: Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: _themeProvider.secondBackgroundColor,
+            ),
+          ),
+          ImageUtils.checkIfIsVideo(firebaseUrl)
+              ? Center(
+                  child: Icon(
+                    Icons.play_circle_filled,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                )
+              : Container(),
+          index == 3 && listFirebaseUrl.length != 4
+              ? Container(
+                  color: Colors.black54,
+                  child: Center(
+                    child: Text(
+                      '+${listFirebaseUrl.length - 4}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
+        ],
+      ),
+    );
   }
 
   @override

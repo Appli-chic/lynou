@@ -27,5 +27,7 @@
   "new_post_error_empty": "Votre publication ne doit pas être vide.",
   "send": "Envoyer",
   "error_dialog": "Erreur",
-  "ok": "OK"
+  "ok": "OK",
+  "cancel": "Annuler",
+  "asset_picker_no_folders": "Aucun dossier de photos trouvé"
 }

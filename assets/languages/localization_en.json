@@ -27,5 +27,7 @@
   "new_post_error_empty": "Your post must not be empty.",
   "send": "Send",
   "error_dialog": "Error",
-  "ok": "OK"
+  "ok": "OK",
+  "cancel": "Cancel",
+  "asset_picker_no_folders": "You have no folders to select from"
 }

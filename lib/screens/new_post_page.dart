@@ -48,12 +48,14 @@ class _NewPostPageState extends State<NewPostPage> {
   /// Call the Gallery and retrieve the photos
   Future _getImageFromGallery() async {
     var isGranted = await AssetPicker.checkPermission();
+    var appTranslations = AppTranslations.of(context);
 
     if (isGranted) {
       await showModalBottomSheet<Set<MediaFile>>(
         context: navigatorKey.currentState.overlay.context,
         builder: (BuildContext context) {
           return AssetPicker(
+            appTranslations: appTranslations,
             withImages: true,
             withVideos: true,
             onDone: (Set<MediaFile> selectedFiles) async {
