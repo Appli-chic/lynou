@@ -54,12 +54,13 @@ class UserService {
       await uploadTask.onComplete;
 
       // Upload thumbnails
-      if(file.type == MediaType.VIDEO) {
+      if (file.type == MediaType.VIDEO) {
         var fileName = basenameWithoutExtension(file.path) + ".jpg";
         String path = 'users/${user.uid}/posts/$postId/$fileName';
         final StorageReference thumbnailStorageReference =
-        FirebaseStorage().ref().child(path);
-        StorageUploadTask thumbnailUploadTask = thumbnailStorageReference.putFile(File(file.thumbnailPath));
+            FirebaseStorage().ref().child(path);
+        StorageUploadTask thumbnailUploadTask =
+            thumbnailStorageReference.putFile(File(file.thumbnailPath));
         await thumbnailUploadTask.onComplete;
       }
 
@@ -84,15 +85,28 @@ class UserService {
   }
 
   /// Fetch all the posts concerning the user and his friends
-  Future<List<Post>> fetchWallPosts(Source source) async {
+  /// Add a last UID to retrieve only after a specific document.
+  Future<List<Post>> fetchWallPosts(Source source, {DocumentSnapshot document}) async {
     var user = await _auth.currentUser();
     var postList = List<Post>();
-    var query = await Firestore.instance
-        .collection('posts')
-        .where('userId', isEqualTo: user.uid)
-        .limit(10)
-        .orderBy('updatedAt', descending: true)
-        .getDocuments(source: source);
+    var query;
+
+    if(document == null) {
+      query = await Firestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: user.uid)
+          .limit(10)
+          .orderBy('updatedAt', descending: true)
+          .getDocuments(source: source);
+    } else {
+      query = await Firestore.instance
+          .collection('posts')
+          .where('userId', isEqualTo: user.uid)
+          .limit(10)
+          .orderBy('updatedAt', descending: true)
+          .startAfterDocument(document)
+          .getDocuments(source: source);
+    }
 
     for (var document in query.documents) {
       var post = Post.fromJson(document.data);
@@ -104,5 +118,19 @@ class UserService {
     }
 
     return postList;
+  }
+
+  /// Retrieve the offline document from a post.
+  Future<DocumentSnapshot> fetchPostOfflineDocumentByUid(String uid) async {
+    var query = await Firestore.instance
+        .collection('posts')
+        .where(uid)
+        .getDocuments(source: Source.cache);
+
+    if(query.documents.isEmpty) {
+      throw Exception;
+    }
+
+    return query.documents[0];
   }
 }
