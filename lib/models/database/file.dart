@@ -1,13 +1,11 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class LYFile {
   String uid;
   String userId;
   String postId;
   String path;
   String type;
-  Timestamp createdAt;
-  Timestamp updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   LYFile({
     this.uid,

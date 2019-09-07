@@ -1,9 +1,8 @@
-import 'package:cache_image/cache_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/avatar.dart';
 import 'package:lynou/components/general/chip.dart';
 import 'package:lynou/localization/app_translations.dart';
-import 'package:lynou/models/post.dart';
+import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
 import 'package:lynou/utils/image.dart';
@@ -58,14 +57,14 @@ class _PostFeedState extends State<PostFeed>
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(top: 8),
-              child: CacheImage.firebase(
-                fit: BoxFit.fitWidth,
-                path: ImageUtils.displaysThumbnails(firebaseUrl),
-                placeholder: Container(
-                  height: 150,
-                  color: _themeProvider.secondBackgroundColor,
-                ),
-              ),
+//              child: CacheImage.firebase(
+//                fit: BoxFit.fitWidth,
+//                path: ImageUtils.displaysThumbnails(firebaseUrl),
+//                placeholder: Container(
+//                  height: 150,
+//                  color: _themeProvider.secondBackgroundColor,
+//                ),
+//              ),
             ),
             ImageUtils.checkIfIsVideo(firebaseUrl)
                 ? Container(
@@ -145,17 +144,17 @@ class _PostFeedState extends State<PostFeed>
       },
       child: Stack(
         children: <Widget>[
-          CacheImage.firebase(
-            fit: BoxFit.cover,
-            width: double.infinity,
-            height: double.infinity,
-            path: ImageUtils.displaysThumbnails(firebaseUrl),
-            placeholder: Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: _themeProvider.secondBackgroundColor,
-            ),
-          ),
+//          CacheImage.firebase(
+//            fit: BoxFit.cover,
+//            width: double.infinity,
+//            height: double.infinity,
+//            path: ImageUtils.displaysThumbnails(firebaseUrl),
+//            placeholder: Container(
+//              width: double.infinity,
+//              height: double.infinity,
+//              color: _themeProvider.secondBackgroundColor,
+//            ),
+//          ),
           ImageUtils.checkIfIsVideo(firebaseUrl)
               ? Center(
                   child: Icon(
@@ -191,10 +190,10 @@ class _PostFeedState extends State<PostFeed>
     var languageCode =
         AppTranslations.of(context).locale.languageCode.split("_")[0] +
             "_short";
-    final timeFormatted = timeago.format(
-      widget.post.createdAt.toDate(),
-      locale: languageCode,
-    );
+//    final timeFormatted = timeago.format(
+//      widget.post.createdAt.toDate(),
+//      locale: languageCode,
+//    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -229,14 +228,14 @@ class _PostFeedState extends State<PostFeed>
                             ),
                           ),
                         ),
-                        Text(
-                          timeFormatted,
-                          style: TextStyle(
-                            color: _themeProvider.textColor,
-                            fontWeight: FontWeight.w300,
-                            fontSize: 13,
-                          ),
-                        ),
+//                        Text(
+//                          timeFormatted,
+//                          style: TextStyle(
+//                            color: _themeProvider.textColor,
+//                            fontWeight: FontWeight.w300,
+//                            fontSize: 13,
+//                          ),
+//                        ),
                       ],
                     ),
                     Container(

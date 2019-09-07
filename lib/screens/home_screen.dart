@@ -1,9 +1,8 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/floating_action_button.dart';
 import 'package:lynou/components/post-feed.dart';
 import 'package:lynou/localization/app_translations.dart';
-import 'package:lynou/models/post.dart';
+import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/new_post_page.dart';
 import 'package:lynou/services/user_service.dart';
@@ -44,54 +43,54 @@ class _HomeScreenState extends State<HomeScreen>
       });
 
       // Get posts from cache
-      List<Post> postsFromCache =
-          await _userService.fetchWallPosts(Source.cache);
-      setState(() {
-        _postList = postsFromCache;
-      });
-
-      // Get posts from the server
-      _userService.fetchWallPosts(Source.server).then((posts) {
-        _postList.clear();
-        _postList = posts;
-
-        setState(() {});
-      });
+//      List<Post> postsFromCache =
+//          await _userService.fetchWallPosts(Source.cache);
+//      setState(() {
+//        _postList = postsFromCache;
+//      });
+//
+//      // Get posts from the server
+//      _userService.fetchWallPosts(Source.server).then((posts) {
+//        _postList.clear();
+//        _postList = posts;
+//
+//        setState(() {});
+//      });
     }
   }
 
   /// Refresh the posts when we pull the top of the sreen
   Future<void> _refreshPosts() async {
-    var posts = await _userService.fetchWallPosts(Source.server);
-
-    for (var post in posts.reversed) {
-      var postListFiltered = _postList.where((p) => p.uid == post.uid);
-
-      if (postListFiltered.length == 0) {
-        _postList.insert(0, post);
-      }
-    }
-
-    setState(() {});
-    return;
+//    var posts = await _userService.fetchWallPosts(Source.server);
+//
+//    for (var post in posts.reversed) {
+//      var postListFiltered = _postList.where((p) => p.uid == post.uid);
+//
+//      if (postListFiltered.length == 0) {
+//        _postList.insert(0, post);
+//      }
+//    }
+//
+//    setState(() {});
+//    return;
   }
 
   /// Load more posts when we arrive at the bottom of the page.
   _loadMore() async {
-    var lastDocument =
-        await _userService.fetchPostOfflineDocumentByUid(_postList.last.uid);
-    var posts = await _userService.fetchWallPosts(Source.server,
-        document: lastDocument);
-
-    for (var post in posts) {
-      var postListFiltered = _postList.where((p) => p.uid == post.uid);
-
-      if (postListFiltered.length == 0) {
-        _postList.add(post);
-      }
-    }
-
-    setState(() {});
+//    var lastDocument =
+//        await _userService.fetchPostOfflineDocumentByUid(_postList.last.uid);
+//    var posts = await _userService.fetchWallPosts(Source.server,
+//        document: lastDocument);
+//
+//    for (var post in posts) {
+//      var postListFiltered = _postList.where((p) => p.uid == post.uid);
+//
+//      if (postListFiltered.length == 0) {
+//        _postList.add(post);
+//      }
+//    }
+//
+//    setState(() {});
   }
 
   @override

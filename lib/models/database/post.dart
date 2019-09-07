@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class Post {
   String uid;
   String userId;
   String text;
-  Timestamp createdAt;
-  Timestamp updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
   List<String> fileList;
 
   // For displaying

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:lynou/localization/app_translations_delegate.dart';
 import 'package:lynou/localization/application.dart';
+import 'package:lynou/models/env.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/auth/choose_theme_screen.dart';
 import 'package:lynou/screens/auth/login_screen.dart';
@@ -11,7 +12,6 @@ import 'package:lynou/screens/auth/signup_screen.dart';
 import 'package:lynou/screens/splash_screen.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:lynou/services/user_service.dart';
-import 'package:lynou/utils/firebase-config.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -19,10 +19,6 @@ import 'localization/timeago/fr_short_messages.dart';
 
 
 void main() async {
-  // Config Firebase
-  var _fireBaseConfig = FireBaseConfig();
-  await _fireBaseConfig.initFireBase();
-
   // Config locales for timeago
   timeago.setLocaleMessages('fr', timeago.FrMessages());
   timeago.setLocaleMessages('fr_short', FrShortMessages());
@@ -37,12 +33,21 @@ class App extends StatefulWidget {
 
 class _AppState extends State<App> {
   AppTranslationsDelegate _newLocaleDelegate;
+  Env _env = Env();
 
   @override
   void initState() {
     super.initState();
     _newLocaleDelegate = AppTranslationsDelegate(newLocale: null);
     application.onLocaleChanged = onLocaleChange;
+
+    _onLoadEnvFile();
+  }
+
+  /// Load the env file which contains critic data
+  void _onLoadEnvFile() async {
+    _env = await EnvParser().load();
+    setState(() {});
   }
 
   /// Triggers when the [locale] changes
@@ -61,7 +66,7 @@ class _AppState extends State<App> {
     return MultiProvider(
       providers: [
         Provider<AuthService>.value(
-          value: AuthService(),
+          value: AuthService(env: _env),
         ),
         Provider<UserService>.value(
           value: UserService(),

@@ -1,7 +1,5 @@
 import 'dart:io';
 
-import 'package:cache_image/cache_image.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lynou/providers/theme_provider.dart';
@@ -244,17 +242,17 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     if (widget.firebaseUrl != null) {
       if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
         _isOverlayVisible = true;
-        var ref = FirebaseStorage.instance.ref().child(widget.firebaseUrl);
-        ref.getDownloadURL().then((url) {
-          _videoPlayerController = VideoPlayerController.network(url)
-            ..initialize().then((_) {
-              // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-              _isVideoLoading = false;
-              setState(() {});
-            });
-
-          _videoPlayerController.addListener(listener);
-        });
+//        var ref = FirebaseStorage.instance.ref().child(widget.firebaseUrl);
+//        ref.getDownloadURL().then((url) {
+//          _videoPlayerController = VideoPlayerController.network(url)
+//            ..initialize().then((_) {
+//              // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+//              _isVideoLoading = false;
+//              setState(() {});
+//            });
+//
+//          _videoPlayerController.addListener(listener);
+//        });
       }
     }
   }
@@ -507,10 +505,10 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
         } else {
           // Displays photos
           return Center(
-            child: CacheImage.firebase(
-              fit: BoxFit.fitWidth,
-              path: widget.firebaseUrl,
-            ),
+//            child: CacheImage.firebase(
+//              fit: BoxFit.fitWidth,
+//              path: widget.firebaseUrl,
+//            ),
           );
         }
       }

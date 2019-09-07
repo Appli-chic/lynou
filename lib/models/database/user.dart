@@ -1,11 +1,9 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
-
 class User {
   String uid;
   String email;
   String name;
-  Timestamp createdAt;
-  Timestamp updatedAt;
+  DateTime createdAt;
+  DateTime updatedAt;
 
   User({
     this.uid,

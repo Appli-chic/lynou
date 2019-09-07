@@ -1,50 +1,127 @@
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:lynou/models/user.dart';
+import 'dart:convert';
 
-const String ERROR_USER_NOT_FOUND = "ERROR_USER_NOT_FOUND";
-const String ERROR_WRONG_PASSWORD = "ERROR_WRONG_PASSWORD";
-const String ERROR_EMAIL_ALREADY_EXISTS = "ERROR_EMAIL_ALREADY_IN_USE";
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lynou/models/api_error.dart';
+import 'package:lynou/models/env.dart';
+import 'package:http/http.dart' as http;
+import 'package:lynou/models/token.dart';
+
+const String AUTH_LOGIN = "/api/auth/login";
+const String AUTH_SIGNUP = "/api/auth";
+const String AUTH_REFRESH_TOKEN = "/api/auth/refresh";
+
+const String ERROR_EMAIL_OR_PASSWORD_INCORRECT =
+    "CODE_ERROR_EMAIL_OR_PASSWORD_INCORRECT";
+const String ERROR_EMAIL_ALREADY_EXISTS = "CODE_ERROR_EMAIL_ALREADY_EXISTS";
+const String ERROR_SERVER = "CODE_ERROR_SERVER";
 
 class AuthService {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
+  var client = http.Client();
+  final Env env;
+
+  AuthService({
+    this.env,
+  });
 
   /// Login the user with an [email] and a [password]
   ///
-  /// Throws [PlatformException] if the [email] or [password] is wrong.
+  /// Throws [ApiError] if the [email] or [password] is wrong.
   Future<void> login(String email, String password) async {
-    await _auth.signInWithEmailAndPassword(email: email, password: password);
+    var response = await client.post("${env.apiUrl}$AUTH_LOGIN",
+        body: json.encode({
+          "email": email,
+          "password": password,
+        }));
+
+    if (response.statusCode == 200) {
+      // Retrieve the tokens
+      final storage = FlutterSecureStorage();
+      Token token = Token.fromJson(json.decode(response.body));
+
+      // Store the tokens
+      await storage.write(key: env.accessTokenKey, value: token.accessToken);
+      await storage.write(key: env.refreshTokenKey, value: token.refreshToken);
+      await storage.write(
+          key: env.expiresInKey, value: token.expiresIn.toString());
+
+      // Add the timer to refresh the token
+      refreshAccessTokenTimer(token.expiresIn);
+    } else {
+      throw ApiError.fromJson(json.decode(response.body));
+    }
   }
 
   /// Signup the user with an [email], [name], [password]
   ///
-  /// Throws [PlatformException] if the [email] already exists.
+  /// Throws [ApiError] if the [email] already exists.
   Future<void> signUp(String email, String name, String password) async {
-    await _auth.createUserWithEmailAndPassword(
-        email: email, password: password);
+    var response = await client.post("${env.apiUrl}$AUTH_SIGNUP",
+        body:
+            json.encode({"email": email, "name": name, "password": password}));
 
-    var user = await _auth.currentUser();
-    var newUser = User(
-      email: email,
-      name: name,
-      createdAt: Timestamp.now(),
-      updatedAt: Timestamp.now(),
-    );
+    if (response.statusCode == 201) {
+      // Retrieve the tokens
+      final storage = FlutterSecureStorage();
+      Token token = Token.fromJson(json.decode(response.body));
 
-    await Firestore.instance
-        .collection('users')
-        .document(user.uid)
-        .setData(newUser.toJson());
+      // Store the tokens
+      await storage.write(key: env.accessTokenKey, value: token.accessToken);
+      await storage.write(key: env.refreshTokenKey, value: token.refreshToken);
+      await storage.write(
+          key: env.expiresInKey, value: token.expiresIn.toString());
+
+      // Add the timer to refresh the token
+      refreshAccessTokenTimer(token.expiresIn);
+    } else {
+      throw ApiError.fromJson(json.decode(response.body));
+    }
   }
 
   /// Check if the user is logged in
   Future<bool> isLoggedIn() async {
-    var user = await _auth.currentUser();
+    final storage = FlutterSecureStorage();
+    final accessToken = await storage.read(key: env.accessTokenKey);
 
-    if (user == null) {
-      return false;
-    } else {
+    if (accessToken != null && env.accessTokenKey.isNotEmpty) {
+      // Add the timer to refresh the token
+      await refreshAccessToken();
       return true;
+    } else {
+      return false;
     }
+  }
+
+  // Retrieve the access token
+  Future<String> getAccessToken() async {
+    final storage = FlutterSecureStorage();
+    return await storage.read(key: env.accessTokenKey);
+  }
+
+  // Refresh the access token each time it delayed
+  Future<void> refreshAccessToken() async {
+    final storage = FlutterSecureStorage();
+    final refreshToken = await storage.read(key: env.refreshTokenKey);
+
+    var response = await client.post("${env.apiUrl}$AUTH_REFRESH_TOKEN",
+        body: json.encode({"refreshToken": refreshToken}));
+
+    if (response.statusCode == 200) {
+      // Retrieve the tokens
+      Token token = Token.fromJson(json.decode(response.body));
+
+      // Store the tokens
+      await storage.write(key: env.accessTokenKey, value: token.accessToken);
+      refreshAccessTokenTimer(token.expiresIn);
+    } else {
+      throw ApiError.fromJson(json.decode(response.body));
+    }
+  }
+
+  // A timer to refresh the access token one minute before it expires
+  refreshAccessTokenTimer(int time) async {
+    var newTime = time - 60000; // Renew 1min before it expires
+    await Future.delayed(Duration(milliseconds: newTime));
+    await refreshAccessToken();
+    refreshAccessTokenTimer(time);
   }
 }

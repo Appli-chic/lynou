@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lynou/components/forms/loading_dialog.dart';
@@ -95,10 +94,10 @@ class _NewPostPageState extends State<NewPostPage> {
         _isLoading = true;
       });
 
-      var user = await FirebaseAuth.instance.currentUser();
+//      var user = await FirebaseAuth.instance.currentUser();
       var post = await _userService.createPost(_textController.text, _fileList);
-      var newUser = await _userService.getUserFromCacheIfExists(user.uid);
-      post.name = newUser.name;
+//      var newUser = await _userService.getUserFromCacheIfExists(user.uid);
+//      post.name = newUser.name;
 
       this.setState(() {
         _isLoading = false;

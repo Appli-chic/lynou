@@ -5,6 +5,7 @@ import 'package:lynou/components/forms/loading_dialog.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
 import 'package:lynou/components/forms/rounded_text_form.dart';
 import 'package:lynou/localization/app_translations.dart';
+import 'package:lynou/models/api_error.dart';
 import 'package:lynou/services/auth_service.dart';
 import 'package:provider/provider.dart';
 import 'package:validate/validate.dart';
@@ -135,10 +136,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
             _isLoading = false;
           });
 
-          if (e is PlatformException) {
-            if (e.code == ERROR_EMAIL_ALREADY_EXISTS)
+          if (e is ApiError) {
+            if (e.code == ERROR_EMAIL_ALREADY_EXISTS) {
               errorList.add(AppTranslations.of(context)
                   .text("sign_up_email_already_exists"));
+            } else if (e.code == ERROR_SERVER) {
+              errorList.add(AppTranslations.of(context).text("error_server"));
+            } else {
+              errorList.add(AppTranslations.of(context).text("error_server"));
+            }
           } else {
             errorList.add(AppTranslations.of(context).text("error_server"));
           }
