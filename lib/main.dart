@@ -11,6 +11,7 @@ import 'package:lynou/screens/main_screen.dart';
 import 'package:lynou/screens/auth/signup_screen.dart';
 import 'package:lynou/screens/splash_screen.dart';
 import 'package:lynou/services/auth_service.dart';
+import 'package:lynou/services/post_service.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -69,7 +70,10 @@ class _AppState extends State<App> {
           value: AuthService(env: _env),
         ),
         Provider<UserService>.value(
-          value: UserService(),
+          value: UserService(env: _env),
+        ),
+        Provider<PostService>.value(
+          value: PostService(env: _env),
         ),
         ChangeNotifierProvider<ThemeProvider>.value(
           value: ThemeProvider(),

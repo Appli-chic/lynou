@@ -11,7 +11,7 @@ import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/asset-picker/asset-picker.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
-import 'package:lynou/services/user_service.dart';
+import 'package:lynou/services/post_service.dart';
 import 'package:lynou/utils/compressor.dart';
 import 'package:media_picker_builder/data/media_file.dart';
 import 'package:provider/provider.dart';
@@ -26,7 +26,7 @@ class _NewPostPageState extends State<NewPostPage> {
   final navigatorKey = GlobalKey<NavigatorState>();
   TextEditingController _textController = TextEditingController();
   ThemeProvider _themeProvider;
-  UserService _userService;
+  PostService _postService;
 
   List<MediaFile> _fileList = List();
   bool _isLoading = false;
@@ -95,7 +95,7 @@ class _NewPostPageState extends State<NewPostPage> {
       });
 
 //      var user = await FirebaseAuth.instance.currentUser();
-      var post = await _userService.createPost(_textController.text, _fileList);
+      var post = await _postService.createPost(_textController.text, _fileList);
 //      var newUser = await _userService.getUserFromCacheIfExists(user.uid);
 //      post.name = newUser.name;
 
@@ -112,6 +112,10 @@ class _NewPostPageState extends State<NewPostPage> {
         description: AppTranslations.of(context).text("new_post_error_empty"),
       );
       errorDialog.show();
+
+      this.setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -199,7 +203,7 @@ class _NewPostPageState extends State<NewPostPage> {
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
-    _userService = Provider.of<UserService>(context);
+    _postService = Provider.of<PostService>(context);
 
     return LoadingDialog(
       isDisplayed: _isLoading,

@@ -81,10 +81,13 @@ class AuthService {
   Future<bool> isLoggedIn() async {
     final storage = FlutterSecureStorage();
     final accessToken = await storage.read(key: env.accessTokenKey);
+//    await storage.delete(key: env.accessTokenKey);
 
     if (accessToken != null && env.accessTokenKey.isNotEmpty) {
       // Add the timer to refresh the token
-      await refreshAccessToken();
+      try {
+        await refreshAccessToken();
+      } catch (e) {}
       return true;
     } else {
       return false;

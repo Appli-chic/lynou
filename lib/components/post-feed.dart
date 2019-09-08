@@ -37,7 +37,7 @@ class _PostFeedState extends State<PostFeed>
     if (widget.post.fileList != null && widget.post.fileList.length == 1) {
       var listFirebaseUrl = List<String>();
       var firebaseUrl =
-          'users/${widget.post.userId}/posts/${widget.post.uid}/${widget.post.fileList[0]}';
+          'users/${widget.post.userId}/posts/${widget.post.id}/${widget.post.fileList[0]}';
       listFirebaseUrl.add(firebaseUrl);
 
       return GestureDetector(
@@ -89,7 +89,7 @@ class _PostFeedState extends State<PostFeed>
 
       for (var file in widget.post.fileList) {
         var firebaseUrl =
-            'users/${widget.post.userId}/posts/${widget.post.uid}/$file';
+            'users/${widget.post.userId}/posts/${widget.post.id}/$file';
         listFirebaseUrl.add(firebaseUrl);
       }
 
@@ -103,7 +103,7 @@ class _PostFeedState extends State<PostFeed>
 
         if (index < 4) {
           listAssets.add(_displayAssetForGrid(
-              'users/${widget.post.userId}/posts/${widget.post.uid}/$file',
+              'users/${widget.post.userId}/posts/${widget.post.id}/$file',
               index,
               listFirebaseUrl));
         }

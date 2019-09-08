@@ -1,16 +1,18 @@
+import 'package:lynou/models/database/file.dart';
+
 class Post {
-  String uid;
+  int id;
   String userId;
   String text;
   DateTime createdAt;
   DateTime updatedAt;
-  List<String> fileList;
+  List<LYFile> fileList;
 
   // For displaying
   String name;
 
   Post({
-    this.uid,
+    this.id,
     this.userId,
     this.text,
     this.fileList,
@@ -19,27 +21,27 @@ class Post {
   });
 
   factory Post.fromJson(Map<String, dynamic> jsonMap) {
-    List<String> fileList = [];
+    List<LYFile> fileList = [];
 
     if (jsonMap["fileList"] != null) {
-      fileList = List<String>.from(jsonMap["fileList"]);
+      fileList = List<LYFile>.from(jsonMap["fileList"]);
     }
 
     return Post(
-      uid: jsonMap["uid"],
-      userId: jsonMap["userId"],
+      id: jsonMap["id"],
+      userId: jsonMap["user_id"],
       text: jsonMap["text"],
       fileList: fileList,
-      createdAt: jsonMap["createdAt"],
-      updatedAt: jsonMap["updatedAt"],
+      createdAt: jsonMap["created_at"],
+      updatedAt: jsonMap["updated_at"],
     );
   }
 
   Map<String, dynamic> toJson() => {
-        'userId': userId,
+        'user_id': userId,
         'text': text,
         'fileList': fileList,
-        'createdAt': createdAt,
-        'updatedAt': updatedAt,
+        'created_at': createdAt,
+        'updated_at': updatedAt,
       };
 }

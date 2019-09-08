@@ -3,7 +3,6 @@ import 'package:lynou/components/general/icon.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/chat_screen.dart';
 import 'package:lynou/screens/home_screen.dart';
-import 'package:lynou/utils/life_cycle_event_handler.dart';
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {

@@ -3,7 +3,7 @@ class LYFile {
   String userId;
   String postId;
   String path;
-  String type;
+  int type;
   DateTime createdAt;
   DateTime updatedAt;
 

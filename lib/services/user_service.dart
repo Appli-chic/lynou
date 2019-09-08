@@ -1,13 +1,45 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:lynou/models/api_error.dart';
+import 'package:lynou/models/env.dart';
 import 'package:media_picker_builder/data/media_file.dart';
 import 'package:path/path.dart';
 import 'package:lynou/models/database/post.dart';
 import 'package:lynou/models/database/user.dart';
+import 'package:http/http.dart' as http;
+
+const String USER_GET_PHOTO = "/api/user/photo";
+const String FILE_DOWNLOAD = "/api/file";
 
 class UserService {
+  var client = http.Client();
+  final Env env;
 
-  /// Get the user by it's [userId] from the cache of Firestore
+  UserService({
+    this.env,
+  });
+
+  // Fetch the url to
+  Future<String> getProfilePhotoUrl() async {
+    final storage = FlutterSecureStorage();
+    var accessToken = await storage.read(key: env.accessTokenKey);
+
+    var response = await client.get("${env.apiUrl}$USER_GET_PHOTO", headers: {
+      HttpHeaders.authorizationHeader: "Bearer $accessToken"
+    });
+
+    if (response.statusCode == 200) {
+      // Retrieve the user's photo url
+      var user = User.fromJson(json.decode(response.body));
+      return "${env.apiUrl}$FILE_DOWNLOAD/${user.photo}";
+    } else {
+      throw ApiError.fromJson(json.decode(response.body));
+    }
+  }
+
+  /// Get the user by it's [userId] from the cache of
   /// If the user doesn't exists then we retrieve it from the server
   Future<User> getUserFromCacheIfExists(String userId) async {
     User user;
@@ -29,55 +61,6 @@ class UserService {
 //    }
 
     return user;
-  }
-
-  /// Create a post directly in firebase
-  ///
-  /// It sends the written [text] and is assigned to the user with the user's id
-  /// If the the post also contains [files] to upload
-  Future<Post> createPost(String text, List<MediaFile> files) async {
-//    var user = await _auth.currentUser();
-//    var postId = Firestore.instance.collection('posts').document().documentID;
-//    List<String> fileList = [];
-//
-//    // Upload files if they exist
-//    for (var file in files) {
-//      String path = 'users/${user.uid}/posts/$postId/${basename(file.path)}';
-//      final StorageReference storageReference =
-//          FirebaseStorage().ref().child(path);
-//
-//      StorageUploadTask uploadTask = storageReference.putFile(File(file.path));
-//      await uploadTask.onComplete;
-//
-//      // Upload thumbnails
-//      if (file.type == MediaType.VIDEO) {
-//        var fileName = basenameWithoutExtension(file.path) + ".jpg";
-//        String path = 'users/${user.uid}/posts/$postId/$fileName';
-//        final StorageReference thumbnailStorageReference =
-//            FirebaseStorage().ref().child(path);
-//        StorageUploadTask thumbnailUploadTask =
-//            thumbnailStorageReference.putFile(File(file.thumbnailPath));
-//        await thumbnailUploadTask.onComplete;
-//      }
-//
-//      fileList.add(basename(file.path));
-//    }
-//
-//    var post = Post(
-//      userId: user.uid,
-//      text: text,
-//      fileList: fileList,
-//      createdAt: Timestamp.now(),
-//      updatedAt: Timestamp.now(),
-//    );
-//
-//    await Firestore.instance
-//        .collection('posts')
-//        .document(postId)
-//        .setData(post.toJson());
-//
-//    post.uid = postId;
-//    return post;
   }
 
   /// Fetch all the posts concerning the user and his friends
