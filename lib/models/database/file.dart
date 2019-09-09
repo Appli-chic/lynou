@@ -1,37 +1,29 @@
 class LYFile {
-  String uid;
+  String id;
   String userId;
   String postId;
-  String path;
+  String name;
   int type;
   DateTime createdAt;
   DateTime updatedAt;
 
   LYFile({
-    this.uid,
+    this.id,
     this.userId,
     this.postId,
-    this.path,
+    this.name,
     this.createdAt,
     this.updatedAt,
   });
 
   factory LYFile.fromJson(Map<String, dynamic> jsonMap) {
     return LYFile(
-      uid: jsonMap["uid"],
-      userId: jsonMap["userId"],
-      postId: jsonMap["postId"],
-      path: jsonMap["path"],
-      createdAt: jsonMap["createdAt"],
-      updatedAt: jsonMap["updatedAt"],
+      id: jsonMap["Id"],
+      userId: jsonMap["UserId"],
+      postId: jsonMap["PostId"],
+      name: jsonMap["Name"],
+      createdAt: jsonMap["CreatedAt"],
+      updatedAt: jsonMap["UpdatedAt"],
     );
   }
-
-  Map<String, dynamic> toJson() => {
-    'userId': userId,
-    'postId': postId,
-    'path': path,
-    'createdAt': createdAt,
-    'updatedAt': updatedAt,
-  };
 }

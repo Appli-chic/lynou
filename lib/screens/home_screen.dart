@@ -5,6 +5,7 @@ import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/new_post_page.dart';
+import 'package:lynou/services/post_service.dart';
 import 'package:lynou/services/user_service.dart';
 import 'package:provider/provider.dart';
 
@@ -16,10 +17,11 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with AutomaticKeepAliveClientMixin<HomeScreen> {
   ThemeProvider _themeProvider;
-  UserService _userService;
+  PostService _postService;
 
   bool _isStartedOnce = false;
   List<Post> _postList = List<Post>();
+  var page = 0;
 
   /// Redirect to the page to create a new post.
   /// If a post is really created then we add it directly to the feed.
@@ -50,6 +52,11 @@ class _HomeScreenState extends State<HomeScreen>
 //      });
 //
 //      // Get posts from the server
+      var postList = await _postService.fetchWallPosts(page);
+      _postList.clear();
+      setState(() {
+        _postList = postList;
+      });
 //      _userService.fetchWallPosts(Source.server).then((posts) {
 //        _postList.clear();
 //        _postList = posts;
@@ -97,7 +104,7 @@ class _HomeScreenState extends State<HomeScreen>
   Widget build(BuildContext context) {
     super.build(context);
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
-    _userService = Provider.of<UserService>(context);
+    _postService = Provider.of<PostService>(context);
 
     _loadPosts();
 

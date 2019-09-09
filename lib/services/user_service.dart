@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lynou/models/api_error.dart';
 import 'package:lynou/models/env.dart';
+import 'package:lynou/services/storage_service.dart';
 import 'package:media_picker_builder/data/media_file.dart';
 import 'package:path/path.dart';
 import 'package:lynou/models/database/post.dart';
@@ -11,7 +12,6 @@ import 'package:lynou/models/database/user.dart';
 import 'package:http/http.dart' as http;
 
 const String USER_GET_PHOTO = "/api/user/photo";
-const String FILE_DOWNLOAD = "/api/file";
 
 class UserService {
   var client = http.Client();
@@ -32,8 +32,8 @@ class UserService {
 
     if (response.statusCode == 200) {
       // Retrieve the user's photo url
-      var user = User.fromJson(json.decode(response.body));
-      return "${env.apiUrl}$FILE_DOWNLOAD/${user.photo}";
+      var photo = json.decode(response.body)["photo"];
+      return "${env.apiUrl}$FILE_DOWNLOAD/$photo";
     } else {
       throw ApiError.fromJson(json.decode(response.body));
     }
@@ -62,42 +62,6 @@ class UserService {
 
     return user;
   }
-
-  /// Fetch all the posts concerning the user and his friends
-  /// Add a last UID to retrieve only after a specific document.
-//  Future<List<Post>> fetchWallPosts(Source source, {DocumentSnapshot document}) async {
-//    var user = await _auth.currentUser();
-//    var postList = List<Post>();
-//    var query;
-//
-//    if(document == null) {
-//      query = await Firestore.instance
-//          .collection('posts')
-//          .where('userId', isEqualTo: user.uid)
-//          .limit(10)
-//          .orderBy('updatedAt', descending: true)
-//          .getDocuments(source: source);
-//    } else {
-//      query = await Firestore.instance
-//          .collection('posts')
-//          .where('userId', isEqualTo: user.uid)
-//          .limit(10)
-//          .orderBy('updatedAt', descending: true)
-//          .startAfterDocument(document)
-//          .getDocuments(source: source);
-//    }
-//
-//    for (var document in query.documents) {
-//      var post = Post.fromJson(document.data);
-//      var user = await getUserFromCacheIfExists(document.data['userId']);
-//
-//      post.name = user.name;
-//      post.uid = document.documentID;
-//      postList.add(post);
-//    }
-//
-//    return postList;
-//  }
 
   /// Retrieve the offline document from a post.
 //  Future<DocumentSnapshot> fetchPostOfflineDocumentByUid(String uid) async {

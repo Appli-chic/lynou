@@ -1,15 +1,14 @@
 import 'package:lynou/models/database/file.dart';
+import 'package:lynou/models/database/user.dart';
 
 class Post {
   int id;
-  String userId;
+  int userId;
   String text;
   DateTime createdAt;
   DateTime updatedAt;
   List<LYFile> fileList;
-
-  // For displaying
-  String name;
+  User user;
 
   Post({
     this.id,
@@ -18,6 +17,7 @@ class Post {
     this.fileList,
     this.createdAt,
     this.updatedAt,
+    this.user,
   });
 
   factory Post.fromJson(Map<String, dynamic> jsonMap) {
@@ -28,12 +28,13 @@ class Post {
     }
 
     return Post(
-      id: jsonMap["id"],
-      userId: jsonMap["user_id"],
-      text: jsonMap["text"],
+      id: jsonMap["ID"],
+      userId: jsonMap["UserId"],
+      text: jsonMap["Text"],
       fileList: fileList,
-      createdAt: jsonMap["created_at"],
-      updatedAt: jsonMap["updated_at"],
+      createdAt: DateTime.parse(jsonMap["CreatedAt"]),
+      updatedAt: DateTime.parse(jsonMap["UpdatedAt"]),
+      user: User.fromJson(jsonMap["User"]),
     );
   }
 

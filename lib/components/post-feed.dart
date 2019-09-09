@@ -190,10 +190,10 @@ class _PostFeedState extends State<PostFeed>
     var languageCode =
         AppTranslations.of(context).locale.languageCode.split("_")[0] +
             "_short";
-//    final timeFormatted = timeago.format(
-//      widget.post.createdAt.toDate(),
-//      locale: languageCode,
-//    );
+    final timeFormatted = timeago.format(
+      widget.post.createdAt,
+      locale: languageCode,
+    );
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -217,7 +217,7 @@ class _PostFeedState extends State<PostFeed>
                           child: Container(
                             margin: EdgeInsets.only(left: 8, right: 8),
                             child: Text(
-                              widget.post.name,
+                              widget.post.user.name,
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                               style: TextStyle(
@@ -228,14 +228,14 @@ class _PostFeedState extends State<PostFeed>
                             ),
                           ),
                         ),
-//                        Text(
-//                          timeFormatted,
-//                          style: TextStyle(
-//                            color: _themeProvider.textColor,
-//                            fontWeight: FontWeight.w300,
-//                            fontSize: 13,
-//                          ),
-//                        ),
+                        Text(
+                          timeFormatted,
+                          style: TextStyle(
+                            color: _themeProvider.textColor,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 13,
+                          ),
+                        ),
                       ],
                     ),
                     Container(

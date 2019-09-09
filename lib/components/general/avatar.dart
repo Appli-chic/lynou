@@ -38,6 +38,7 @@ class _LYAvatarState extends State<LYAvatar> {
     );
   }
 
+  /// Loads the image only once
   _loadsTheImage() async {
     if (!_didFirstLoad) {
       setState(() {

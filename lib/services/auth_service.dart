@@ -124,7 +124,13 @@ class AuthService {
   refreshAccessTokenTimer(int time) async {
     var newTime = time - 60000; // Renew 1min before it expires
     await Future.delayed(Duration(milliseconds: newTime));
-    await refreshAccessToken();
-    refreshAccessTokenTimer(time);
+
+    try {
+      await refreshAccessToken();
+      refreshAccessTokenTimer(time);
+    } catch(e) {
+      await refreshAccessToken();
+      refreshAccessTokenTimer(time);
+    }
   }
 }
