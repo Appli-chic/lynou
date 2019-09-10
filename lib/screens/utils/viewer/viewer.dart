@@ -8,12 +8,12 @@ import 'package:media_picker_builder/data/media_file.dart';
 
 class Viewer extends StatefulWidget {
   final List<MediaFile> files;
-  final List<String> firebaseUrlList;
+  final List<String> urlList;
   final int index;
 
   Viewer({
     this.files,
-    this.firebaseUrlList,
+    this.urlList,
     this.index,
   });
 
@@ -65,7 +65,7 @@ class _ViewerState extends State<Viewer> {
               );
             } else {
               return PhotoViewGalleryPageOptions(
-                videoUrl: widget.files[index].path,
+                videoPath: widget.files[index].path,
                 initialScale: PhotoViewComputedScale.contained,
                 heroTag: widget.files.indexOf(widget.files[index]),
               );
@@ -78,19 +78,19 @@ class _ViewerState extends State<Viewer> {
     }
 
     // Display assets from firebase images
-    if (widget.firebaseUrlList != null) {
+    if (widget.urlList != null) {
       return Scaffold(
         body: PhotoViewGallery.builder(
           scrollPhysics: const BouncingScrollPhysics(),
           builder: (BuildContext context, int index) {
             return PhotoViewGalleryPageOptions(
-              firebaseUrl: widget.firebaseUrlList[index],
+              url: widget.urlList[index],
               initialScale: PhotoViewComputedScale.contained,
               heroTag:
-                  widget.firebaseUrlList.indexOf(widget.firebaseUrlList[index]),
+                  widget.urlList.indexOf(widget.urlList[index]),
             );
           },
-          itemCount: widget.firebaseUrlList.length,
+          itemCount: widget.urlList.length,
           pageController: _pageController,
         ),
       );

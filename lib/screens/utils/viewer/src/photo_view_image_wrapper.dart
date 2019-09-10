@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lynou/components/general/cached_image.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
@@ -19,8 +20,8 @@ typedef PhotoViewImageTapDownCallback = Function(BuildContext context,
 class PhotoViewImageWrapper extends StatefulWidget {
   const PhotoViewImageWrapper({
     Key key,
-    this.firebaseUrl,
-    this.videoUrl,
+    this.url,
+    this.videoPath,
     this.imageProvider,
     this.backgroundDecoration,
     this.gaplessPlayback = false,
@@ -42,15 +43,15 @@ class PhotoViewImageWrapper extends StatefulWidget {
     this.transitionOnUserGestures = false,
     this.onTapUp,
     this.onTapDown,
-    this.firebaseUrl,
-    this.videoUrl,
+    this.url,
+    this.videoPath,
     @required this.delegate,
   })  : imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
 
-  final String firebaseUrl;
-  final String videoUrl;
+  final String url;
+  final String videoPath;
   final Decoration backgroundDecoration;
   final ImageProvider imageProvider;
   final bool gaplessPlayback;
@@ -227,9 +228,9 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       setState(() {});
     };
 
-    if (widget.videoUrl != null) {
+    if (widget.videoPath != null) {
       _isOverlayVisible = true;
-      _videoPlayerController = VideoPlayerController.file(File(widget.videoUrl))
+      _videoPlayerController = VideoPlayerController.file(File(widget.videoPath))
         ..initialize().then((_) {
           // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
           _isVideoLoading = false;
@@ -239,8 +240,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       _videoPlayerController.addListener(listener);
     }
 
-    if (widget.firebaseUrl != null) {
-      if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+    if (widget.url != null) {
+      if (ImageUtils.checkIfIsVideo(widget.url)) {
         _isOverlayVisible = true;
 //        var ref = FirebaseStorage.instance.ref().child(widget.firebaseUrl);
 //        ref.getDownloadURL().then((url) {
@@ -271,7 +272,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     _rotationAnimationController.dispose();
     widget.delegate.dispose();
 
-    if (widget.videoUrl != null) {
+    if (widget.videoPath != null) {
       _videoPlayerController.dispose();
     }
 
@@ -289,9 +290,9 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   /// Displays overlay for images and photos
   Widget _displaysOverlay() {
     if (_isOverlayVisible) {
-      if ((widget.videoUrl != null ||
-          (widget.firebaseUrl != null &&
-              ImageUtils.checkIfIsVideo(widget.firebaseUrl)))) {
+      if ((widget.videoPath != null ||
+          (widget.url != null &&
+              ImageUtils.checkIfIsVideo(widget.url)))) {
         Widget videoOverlay = Material(
           color: Colors.black26,
           child: Container(
@@ -386,13 +387,13 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
               initialData: widget.delegate.controller.prevValue,
               builder: (BuildContext context,
                   AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-                if (widget.firebaseUrl != null) {
-                  if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+                if (widget.url != null) {
+                  if (ImageUtils.checkIfIsVideo(widget.url)) {
                     return _buildHero();
                   } else {
                     return _buildImage(snapshot);
                   }
-                } else if (widget.videoUrl != null) {
+                } else if (widget.videoPath != null) {
                   return _buildHero();
                 } else if (snapshot.hasData) {
                   return _buildImage(snapshot);
@@ -484,12 +485,12 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   }
 
   Widget _buildChild() {
-    if (widget.videoUrl != null) {
+    if (widget.videoPath != null) {
       // Displays video
       return _buildVideoPlayer();
     } else {
       // Displays images
-      if (widget.firebaseUrl == null) {
+      if (widget.url == null) {
         // Displays local images
         return widget.customChild == null
             ? Image(
@@ -499,16 +500,16 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             : widget.customChild;
       } else {
         // Displays firebase images
-        if (ImageUtils.checkIfIsVideo(widget.firebaseUrl)) {
+        if (ImageUtils.checkIfIsVideo(widget.url)) {
           // Displays videos
           return _buildVideoPlayer();
         } else {
           // Displays photos
           return Center(
-//            child: CacheImage.firebase(
-//              fit: BoxFit.fitWidth,
-//              path: widget.firebaseUrl,
-//            ),
+            child: CachedImage(
+              boxFit: BoxFit.fitWidth,
+              url: widget.url,
+            ),
           );
         }
       }

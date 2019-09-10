@@ -20,19 +20,38 @@ class StorageService {
     this.env,
   });
 
-  /// Upload a file to the server
-  Future<void> uploadFile(MediaFile file) async {
+  /// Retrieve the download url from the [name] of a file
+  String getFileDownloadUrl(String name) {
+    return "${env.apiUrl}$FILE_DOWNLOAD/$name";
+  }
+
+  /// Upload a [file] to the server, if [isUploadingThumbnail] is true then
+  /// we will upload the thumbnail data.
+  Future<void> uploadFile(MediaFile file, bool isUploadingThumbnail) async {
     final storage = FlutterSecureStorage();
     var accessToken = await storage.read(key: env.accessTokenKey);
 
+    // Create the request
     var request = http.MultipartRequest("POST",
         Uri.parse("${env.apiUrl}$FILE_UPLOAD/${path.basename(file.path)}"));
     request.headers
         .addAll({HttpHeaders.authorizationHeader: "Bearer $accessToken"});
     String mimeType = mime(file.path.toLowerCase());
-    var fileData = await http.MultipartFile.fromPath('file', file.path,
-        contentType: parser.MediaType('image', mimeType));
-    request.files.add(fileData);
+    var mimTypesSplitted = mimeType.split("/");
+
+    // Add Data
+    if (!isUploadingThumbnail) {
+      // Upload an image or a video
+      var fileData = await http.MultipartFile.fromPath('file', file.path,
+          contentType: parser.MediaType(mimTypesSplitted[0], mimTypesSplitted[1]));
+      request.files.add(fileData);
+    } else {
+      // Upload the thumbnail of a video
+      mimeType = mime(file.thumbnailPath.toLowerCase());
+      var fileData = await http.MultipartFile.fromPath('file', file.thumbnailPath,
+          contentType: parser.MediaType(mimTypesSplitted[0], mimTypesSplitted[1]));
+      request.files.add(fileData);
+    }
 
     http.StreamedResponse response = await request.send();
     if (response.statusCode == 200) {
@@ -41,12 +60,5 @@ class StorageService {
     } else {
       throw ApiError();
     }
-
-//    request.headers = {HttpHeaders.authorizationHeader: "Bearer $accessToken"};
-//    var response = await client.post(
-//      "${env.apiUrl}$FILE_UPLOAD",
-//      headers: {HttpHeaders.authorizationHeader: "Bearer $accessToken"},
-//      body: json.encode({"text": text}),
-//    );
   }
 }

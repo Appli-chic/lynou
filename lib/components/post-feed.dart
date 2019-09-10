@@ -1,10 +1,15 @@
+import 'dart:io';
+
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/avatar.dart';
+import 'package:lynou/components/general/cached_image.dart';
 import 'package:lynou/components/general/chip.dart';
 import 'package:lynou/localization/app_translations.dart';
 import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
+import 'package:lynou/services/storage_service.dart';
 import 'package:lynou/utils/image.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
@@ -23,6 +28,7 @@ class PostFeed extends StatefulWidget {
 class _PostFeedState extends State<PostFeed>
     with AutomaticKeepAliveClientMixin {
   ThemeProvider _themeProvider;
+  StorageService _storageService;
 
   /// Displays photos an videos linked to the post
   /// Videos are displayed with a thumbnail image and a video logo
@@ -35,10 +41,10 @@ class _PostFeedState extends State<PostFeed>
   Widget _displaysMedia() {
     // Displays only one media
     if (widget.post.fileList != null && widget.post.fileList.length == 1) {
-      var listFirebaseUrl = List<String>();
-      var firebaseUrl =
-          'users/${widget.post.userId}/posts/${widget.post.id}/${widget.post.fileList[0]}';
-      listFirebaseUrl.add(firebaseUrl);
+      var urlList = List<String>();
+      var url =
+          _storageService.getFileDownloadUrl(widget.post.fileList[0].name);
+      urlList.add(url);
 
       return GestureDetector(
         onTap: () async {
@@ -46,7 +52,7 @@ class _PostFeedState extends State<PostFeed>
             context,
             MaterialPageRoute(
               builder: (context) => Viewer(
-                firebaseUrlList: listFirebaseUrl,
+                urlList: urlList,
                 index: 0,
               ),
             ),
@@ -57,27 +63,22 @@ class _PostFeedState extends State<PostFeed>
           children: <Widget>[
             Container(
               margin: EdgeInsets.only(top: 8),
-//              child: CacheImage.firebase(
-//                fit: BoxFit.fitWidth,
-//                path: ImageUtils.displaysThumbnails(firebaseUrl),
-//                placeholder: Container(
-//                  height: 150,
-//                  color: _themeProvider.secondBackgroundColor,
-//                ),
-//              ),
+              child: CachedImage(
+                url: url,
+              ),
             ),
-            ImageUtils.checkIfIsVideo(firebaseUrl)
-                ? Container(
-                    margin: EdgeInsets.only(top: 8),
-                    child: Center(
-                      child: Icon(
-                        Icons.play_circle_filled,
-                        color: Colors.white,
-                        size: 40,
-                      ),
-                    ),
-                  )
-                : Container(),
+//            ImageUtils.checkIfIsVideo(url)
+//                ? Container(
+//                    margin: EdgeInsets.only(top: 8),
+//                    child: Center(
+//                      child: Icon(
+//                        Icons.play_circle_filled,
+//                        color: Colors.white,
+//                        size: 40,
+//                      ),
+//                    ),
+//                  )
+//                : Container(),
           ],
         ),
       );
@@ -85,12 +86,11 @@ class _PostFeedState extends State<PostFeed>
         widget.post.fileList.length > 1) {
       // Displays more than one media
       List<Widget> listAssets = [];
-      var listFirebaseUrl = List<String>();
+      var urlList = List<String>();
 
       for (var file in widget.post.fileList) {
-        var firebaseUrl =
-            'users/${widget.post.userId}/posts/${widget.post.id}/$file';
-        listFirebaseUrl.add(firebaseUrl);
+        var url = _storageService.getFileDownloadUrl(file.name);
+        urlList.add(url);
       }
 
       int crossAxisCount = 4;
@@ -102,10 +102,12 @@ class _PostFeedState extends State<PostFeed>
         int index = widget.post.fileList.indexOf(file);
 
         if (index < 4) {
-          listAssets.add(_displayAssetForGrid(
-              'users/${widget.post.userId}/posts/${widget.post.id}/$file',
-              index,
-              listFirebaseUrl));
+          listAssets.add(
+            _displayAssetForGrid(
+                _storageService.getFileDownloadUrl(file.name),
+                index,
+                urlList),
+          );
         }
       }
 
@@ -128,15 +130,14 @@ class _PostFeedState extends State<PostFeed>
 
   /// Displays photos and videos for the grid in case of a post with many
   /// images or videos.
-  Widget _displayAssetForGrid(
-      String firebaseUrl, int index, List<String> listFirebaseUrl) {
+  Widget _displayAssetForGrid(String url, int index, List<String> urlList) {
     return GestureDetector(
       onTap: () async {
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => Viewer(
-              firebaseUrlList: listFirebaseUrl,
+              urlList: urlList,
               index: index,
             ),
           ),
@@ -144,40 +145,35 @@ class _PostFeedState extends State<PostFeed>
       },
       child: Stack(
         children: <Widget>[
-//          CacheImage.firebase(
-//            fit: BoxFit.cover,
-//            width: double.infinity,
-//            height: double.infinity,
-//            path: ImageUtils.displaysThumbnails(firebaseUrl),
-//            placeholder: Container(
-//              width: double.infinity,
-//              height: double.infinity,
-//              color: _themeProvider.secondBackgroundColor,
-//            ),
-//          ),
-          ImageUtils.checkIfIsVideo(firebaseUrl)
-              ? Center(
-                  child: Icon(
-                    Icons.play_circle_filled,
-                    color: Colors.white,
-                    size: 40,
-                  ),
-                )
-              : Container(),
-          index == 3 && listFirebaseUrl.length != 4
-              ? Container(
-                  color: Colors.black54,
-                  child: Center(
-                    child: Text(
-                      '+${listFirebaseUrl.length - 4}',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20,
-                      ),
-                    ),
-                  ),
-                )
-              : Container(),
+          CachedImage(
+            url: url,
+            boxFit: BoxFit.cover,
+            height: double.infinity,
+            width: double.infinity,
+          ),
+//          ImageUtils.checkIfIsVideo(url)
+//              ? Center(
+//                  child: Icon(
+//                    Icons.play_circle_filled,
+//                    color: Colors.white,
+//                    size: 40,
+//                  ),
+//                )
+//              : Container(),
+//          index == 3 && listFirebaseUrl.length != 4
+//              ? Container(
+//                  color: Colors.black54,
+//                  child: Center(
+//                    child: Text(
+//                      '+${listFirebaseUrl.length - 4}',
+//                      style: TextStyle(
+//                        color: Colors.white,
+//                        fontSize: 20,
+//                      ),
+//                    ),
+//                  ),
+//                )
+//              : Container(),
         ],
       ),
     );
@@ -186,6 +182,7 @@ class _PostFeedState extends State<PostFeed>
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+    _storageService = Provider.of<StorageService>(context);
 
     var languageCode =
         AppTranslations.of(context).locale.languageCode.split("_")[0] +

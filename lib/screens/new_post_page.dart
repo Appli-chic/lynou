@@ -85,7 +85,7 @@ class _NewPostPageState extends State<NewPostPage> {
     }
   }
 
-  /// Send the post to FireBase and upload files
+  /// Send the post to the database and upload files
   _sendPost() async {
     if ((_textController.text != null && _textController.text.isNotEmpty) ||
         _fileList.isNotEmpty) {
@@ -94,11 +94,7 @@ class _NewPostPageState extends State<NewPostPage> {
         _isLoading = true;
       });
 
-//      var user = await FirebaseAuth.instance.currentUser();
       var post = await _postService.createPost(_textController.text, _fileList);
-//      var newUser = await _userService.getUserFromCacheIfExists(user.uid);
-//      post.name = newUser.name;
-
       this.setState(() {
         _isLoading = false;
       });

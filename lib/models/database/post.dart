@@ -1,3 +1,5 @@
+import 'dart:collection';
+
 import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/user.dart';
 
@@ -23,8 +25,13 @@ class Post {
   factory Post.fromJson(Map<String, dynamic> jsonMap) {
     List<LYFile> fileList = [];
 
-    if (jsonMap["fileList"] != null) {
-      fileList = List<LYFile>.from(jsonMap["fileList"]);
+    if (jsonMap["Files"] != null) {
+      List<dynamic> jsonFileList = jsonMap["Files"];
+
+      for(var jsonFile in jsonFileList) {
+        LYFile file = LYFile.fromJson(jsonFile);
+        fileList.add(file);
+      }
     }
 
     return Post(
