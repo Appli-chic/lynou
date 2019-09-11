@@ -401,7 +401,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
               initialData: widget.delegate.controller.prevValue,
               builder: (BuildContext context,
                   AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-                if (widget.lynouFile.name != null) {
+                if (widget.lynouFile != null && widget.lynouFile.name != null) {
                   if (widget.lynouFile.type == TYPE_VIDEO) {
                     return _buildHero();
                   } else {
@@ -504,7 +504,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       return _buildVideoPlayer();
     } else {
       // Displays images
-      if (widget.lynouFile.name == null) {
+      if (widget.lynouFile == null) {
         // Displays local images
         return widget.customChild == null
             ? Image(
@@ -514,7 +514,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             : widget.customChild;
       } else {
         // Displays firebase images
-        if (widget.lynouFile.type == TYPE_VIDEO) {
+        if (widget.lynouFile != null && widget.lynouFile.type == TYPE_VIDEO) {
           // Displays videos
           return _buildVideoPlayer();
         } else {

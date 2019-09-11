@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_video_compress/flutter_video_compress.dart';
+//import 'package:flutter_video_compress/flutter_video_compress.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:lynou/components/forms/loading_dialog.dart';
 import 'package:lynou/components/forms/rounded_button.dart';
@@ -25,7 +25,7 @@ class NewPostPage extends StatefulWidget {
 
 class _NewPostPageState extends State<NewPostPage> {
   final navigatorKey = GlobalKey<NavigatorState>();
-  final _flutterVideoCompress = FlutterVideoCompress();
+//  final _flutterVideoCompress = FlutterVideoCompress();
   TextEditingController _textController = TextEditingController();
   ThemeProvider _themeProvider;
   PostService _postService;
@@ -73,13 +73,13 @@ class _NewPostPageState extends State<NewPostPage> {
                   );
                 } else {
                   // Compress the video
-                  final info = await _flutterVideoCompress.compressVideo(
-                    asset.path,
-                    quality: VideoQuality.DefaultQuality,
-                    deleteOrigin: false,
-                  );
-
-                  asset.path = info.path;
+//                  final info = await _flutterVideoCompress.compressVideo(
+//                    asset.path,
+//                    quality: VideoQuality.HighestQuality,
+//                    deleteOrigin: false,
+//                  );
+//
+//                  asset.path = info.path;
                   _fileList.add(asset);
                 }
               }

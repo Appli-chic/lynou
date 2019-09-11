@@ -5,9 +5,6 @@ PODS:
     - Mantle
   - flutter_secure_storage (3.2.0):
     - Flutter
-  - flutter_video_compress (0.3.0):
-    - Flutter
-    - Regift
   - FMDB (2.7.5):
     - FMDB/standard (= 2.7.5)
   - FMDB/standard (2.7.5)
@@ -22,7 +19,6 @@ PODS:
     - Flutter
   - permission_handler (3.2.2):
     - Flutter
-  - Regift (1.5.0)
   - sqflite (0.0.1):
     - Flutter
     - FMDB (~> 2.7.2)
@@ -33,7 +29,6 @@ DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios`)
   - flutter_image_compress (from `.symlinks/plugins/flutter_image_compress/ios`)
   - flutter_secure_storage (from `.symlinks/plugins/flutter_secure_storage/ios`)
-  - flutter_video_compress (from `.symlinks/plugins/flutter_video_compress/ios`)
   - image_picker (from `.symlinks/plugins/image_picker/ios`)
   - media_picker_builder (from `.symlinks/plugins/media_picker_builder/ios`)
   - path_provider (from `.symlinks/plugins/path_provider/ios`)
@@ -45,7 +40,6 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - FMDB
     - Mantle
-    - Regift
 
 EXTERNAL SOURCES:
   Flutter:
@@ -54,8 +48,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/flutter_image_compress/ios"
   flutter_secure_storage:
     :path: ".symlinks/plugins/flutter_secure_storage/ios"
-  flutter_video_compress:
-    :path: ".symlinks/plugins/flutter_video_compress/ios"
   image_picker:
     :path: ".symlinks/plugins/image_picker/ios"
   media_picker_builder:
@@ -73,14 +65,12 @@ SPEC CHECKSUMS:
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
   flutter_image_compress: f69d0e0e078ce52b4810695593bc861ee319ae7d
   flutter_secure_storage: 0c5779648ff644110e507909b77a57e620cbbf8b
-  flutter_video_compress: 641fd3e03d970d79176a59d91d7a4392923710b0
   FMDB: 2ce00b547f966261cd18927a3ddb07cb6f3db82a
   image_picker: 16e5fec1fbc87fd3b297c53e4048521eaf17cd06
   Mantle: 2fa750afa478cd625a94230fbf1c13462f29395b
   media_picker_builder: fac2646d747c8058a4f049190f1b349f2c74dc41
   path_provider: f96fff6166a8867510d2c25fdcc346327cc4b259
   permission_handler: d59f41439f5bc6c4d1005f3355e98f05ddc68ece
-  Regift: d097afd401021f4f42b102ee125ceeb125a38caf
   sqflite: ff1d9da63c06588cc8d1faf7256d741f16989d5a
   video_player: 3964090a33353060ed7f58aa6427c7b4b208ec21
 

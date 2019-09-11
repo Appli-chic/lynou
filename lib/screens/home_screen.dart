@@ -20,8 +20,9 @@ class _HomeScreenState extends State<HomeScreen>
   PostService _postService;
 
   bool _isStartedOnce = false;
+  bool _isLoadingMore = false;
   List<Post> _postList = List<Post>();
-  var page = 0;
+  var _page = 0;
 
   /// Redirect to the page to create a new post.
   /// If a post is really created then we add it directly to the feed.
@@ -52,7 +53,7 @@ class _HomeScreenState extends State<HomeScreen>
 //      });
 //
 //      // Get posts from the server
-      var postList = await _postService.fetchWallPosts(page);
+      var postList = await _postService.fetchWallPosts(_page);
       _postList.clear();
       setState(() {
         _postList = postList;
@@ -60,38 +61,38 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
-  /// Refresh the posts when we pull the top of the sreen
+  /// Refresh the posts when we pull the top of the screen
   Future<void> _refreshPosts() async {
-//    var posts = await _userService.fetchWallPosts(Source.server);
-//
-//    for (var post in posts.reversed) {
-//      var postListFiltered = _postList.where((p) => p.uid == post.uid);
-//
-//      if (postListFiltered.length == 0) {
-//        _postList.insert(0, post);
-//      }
-//    }
-//
-//    setState(() {});
-//    return;
+    var postList = await _postService.fetchWallPosts(0);
+
+    for(var post in postList.reversed) {
+      var doubledPostList = _postList.where((e) => e.id == post.id);
+      if(doubledPostList.isEmpty) {
+        _postList.insert(0, post);
+      }
+    }
+
+    setState(() { });
   }
 
   /// Load more posts when we arrive at the bottom of the page.
   _loadMore() async {
-//    var lastDocument =
-//        await _userService.fetchPostOfflineDocumentByUid(_postList.last.uid);
-//    var posts = await _userService.fetchWallPosts(Source.server,
-//        document: lastDocument);
-//
-//    for (var post in posts) {
-//      var postListFiltered = _postList.where((p) => p.uid == post.uid);
-//
-//      if (postListFiltered.length == 0) {
-//        _postList.add(post);
-//      }
-//    }
-//
-//    setState(() {});
+    if (!_isLoadingMore) {
+      setState(() {
+        _isLoadingMore = true;
+        _page++;
+      });
+
+      var postList = await _postService.fetchWallPosts(_page);
+      _postList.addAll(postList);
+
+      // Don't permit to load more if it is the end.
+      if (postList.isNotEmpty) {
+        setState(() {
+          _isLoadingMore = false;
+        });
+      }
+    }
   }
 
   @override
