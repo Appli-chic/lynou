@@ -2,18 +2,19 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:lynou/models/database/file.dart';
 import 'package:lynou/screens/utils/viewer/photo_view_gallery.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_computed_scale.dart';
 import 'package:media_picker_builder/data/media_file.dart';
 
 class Viewer extends StatefulWidget {
   final List<MediaFile> files;
-  final List<String> urlList;
+  final List<LYFile> lynouFiles;
   final int index;
 
   Viewer({
     this.files,
-    this.urlList,
+    this.lynouFiles,
     this.index,
   });
 
@@ -78,19 +79,19 @@ class _ViewerState extends State<Viewer> {
     }
 
     // Display assets from firebase images
-    if (widget.urlList != null) {
+    if (widget.lynouFiles != null) {
       return Scaffold(
         body: PhotoViewGallery.builder(
           scrollPhysics: const BouncingScrollPhysics(),
           builder: (BuildContext context, int index) {
             return PhotoViewGalleryPageOptions(
-              url: widget.urlList[index],
+              lynouFile: widget.lynouFiles[index],
               initialScale: PhotoViewComputedScale.contained,
               heroTag:
-                  widget.urlList.indexOf(widget.urlList[index]),
+                  widget.lynouFiles.indexOf(widget.lynouFiles[index]),
             );
           },
-          itemCount: widget.urlList.length,
+          itemCount: widget.lynouFiles.length,
           pageController: _pageController,
         ),
       );

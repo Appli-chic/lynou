@@ -3,10 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:lynou/components/general/cached_image.dart';
+import 'package:lynou/models/database/file.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
-import 'package:lynou/utils/image.dart';
+import 'package:lynou/services/storage_service.dart';
 import 'package:provider/provider.dart';
 import 'package:video_player/video_player.dart';
 
@@ -20,7 +21,7 @@ typedef PhotoViewImageTapDownCallback = Function(BuildContext context,
 class PhotoViewImageWrapper extends StatefulWidget {
   const PhotoViewImageWrapper({
     Key key,
-    this.url,
+    this.lynouFile,
     this.videoPath,
     this.imageProvider,
     this.backgroundDecoration,
@@ -43,14 +44,14 @@ class PhotoViewImageWrapper extends StatefulWidget {
     this.transitionOnUserGestures = false,
     this.onTapUp,
     this.onTapDown,
-    this.url,
+    this.lynouFile,
     this.videoPath,
     @required this.delegate,
   })  : imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
 
-  final String url;
+  final LYFile lynouFile;
   final String videoPath;
   final Decoration backgroundDecoration;
   final ImageProvider imageProvider;
@@ -76,8 +77,10 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   VideoPlayerController _videoPlayerController;
   bool _isOverlayVisible = false;
   bool _isVideoLoading = true;
+  bool _didVideoLoaded = false;
 
   ThemeProvider _themeProvider;
+  StorageService _storageService;
 
   Offset _normalizedPosition;
   double _scaleBefore;
@@ -198,6 +201,20 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     }
   }
 
+  _listener() {
+    if (_videoPlayerController.value.position ==
+        _videoPlayerController.value.duration) {
+//      _videoPlayerController.seekTo(Duration(milliseconds: 0));
+//      _videoPlayerController.pause();
+
+      setState(() {
+        _isOverlayVisible = true;
+      });
+    }
+
+    setState(() {});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -214,46 +231,36 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     widget.delegate.addAnimateOnScaleStateUpdate(animateOnScaleStateUpdate);
 
     // Init video player controller
-    var listener = () {
-      if (_videoPlayerController.value.position ==
-          _videoPlayerController.value.duration) {
-        _videoPlayerController.pause();
-        _videoPlayerController.seekTo(Duration(milliseconds: 0));
-
-        setState(() {
-          _isOverlayVisible = true;
-        });
-      }
-
-      setState(() {});
-    };
-
     if (widget.videoPath != null) {
       _isOverlayVisible = true;
       _videoPlayerController = VideoPlayerController.file(File(widget.videoPath))
         ..initialize().then((_) {
           // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-          _isVideoLoading = false;
-          setState(() {});
+          setState(() {
+            _isVideoLoading = false;
+            _didVideoLoaded = true;
+          });
         });
 
-      _videoPlayerController.addListener(listener);
+      _videoPlayerController.addListener(_listener);
     }
+  }
 
-    if (widget.url != null) {
-      if (ImageUtils.checkIfIsVideo(widget.url)) {
+  Future<void> _loadLynouVideo() async {
+    if (widget.lynouFile != null && (_isVideoLoading && !_didVideoLoaded)) {
+      if (widget.lynouFile.type == TYPE_VIDEO) {
         _isOverlayVisible = true;
-//        var ref = FirebaseStorage.instance.ref().child(widget.firebaseUrl);
-//        ref.getDownloadURL().then((url) {
-//          _videoPlayerController = VideoPlayerController.network(url)
-//            ..initialize().then((_) {
-//              // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
-//              _isVideoLoading = false;
-//              setState(() {});
-//            });
-//
-//          _videoPlayerController.addListener(listener);
-//        });
+        var file = await _storageService.downloadVideo(widget.lynouFile.name);
+        _videoPlayerController = VideoPlayerController.file(file)
+          ..initialize().then((_) {
+            // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
+            setState(() {
+            _isVideoLoading = false;
+            _didVideoLoaded = true;
+            });
+          });
+
+        _videoPlayerController.addListener(_listener);
       }
     }
   }
@@ -291,8 +298,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   Widget _displaysOverlay() {
     if (_isOverlayVisible) {
       if ((widget.videoPath != null ||
-          (widget.url != null &&
-              ImageUtils.checkIfIsVideo(widget.url)))) {
+          (widget.lynouFile != null &&
+              widget.lynouFile.type == TYPE_VIDEO))) {
         Widget videoOverlay = Material(
           color: Colors.black26,
           child: Container(
@@ -308,6 +315,11 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
                     : Center(
                         child: IconButton(
                           onPressed: () {
+                            if (_videoPlayerController.value.position ==
+                                _videoPlayerController.value.duration) {
+                              _videoPlayerController.seekTo(Duration(milliseconds: 0));
+                            }
+
                             if (!_videoPlayerController.value.isPlaying) {
                               _videoPlayerController.play();
                             } else {
@@ -373,6 +385,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
   @override
   Widget build(BuildContext context) {
     _themeProvider = Provider.of<ThemeProvider>(context, listen: true);
+    _storageService = Provider.of<StorageService>(context, listen: true);
+    _loadLynouVideo();
 
     return GestureDetector(
       onTap: () {
@@ -387,8 +401,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
               initialData: widget.delegate.controller.prevValue,
               builder: (BuildContext context,
                   AsyncSnapshot<PhotoViewControllerValue> snapshot) {
-                if (widget.url != null) {
-                  if (ImageUtils.checkIfIsVideo(widget.url)) {
+                if (widget.lynouFile.name != null) {
+                  if (widget.lynouFile.type == TYPE_VIDEO) {
                     return _buildHero();
                   } else {
                     return _buildImage(snapshot);
@@ -490,7 +504,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
       return _buildVideoPlayer();
     } else {
       // Displays images
-      if (widget.url == null) {
+      if (widget.lynouFile.name == null) {
         // Displays local images
         return widget.customChild == null
             ? Image(
@@ -500,7 +514,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
             : widget.customChild;
       } else {
         // Displays firebase images
-        if (ImageUtils.checkIfIsVideo(widget.url)) {
+        if (widget.lynouFile.type == TYPE_VIDEO) {
           // Displays videos
           return _buildVideoPlayer();
         } else {
@@ -508,7 +522,7 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
           return Center(
             child: CachedImage(
               boxFit: BoxFit.fitWidth,
-              url: widget.url,
+              url: _storageService.getFileDownloadUrl(widget.lynouFile.name),
             ),
           );
         }

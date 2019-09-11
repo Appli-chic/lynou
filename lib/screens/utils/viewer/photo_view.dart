@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:after_layout/after_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lynou/models/database/file.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_computed_scale.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller_delegate.dart';
@@ -209,7 +210,7 @@ class PhotoView extends StatefulWidget {
   /// Internally, the image is rendered within an [Image] widget.
   PhotoView({
     Key key,
-    this.url,
+    this.lynouFile,
     this.videoPath,
     this.imageProvider,
     this.loadingChild,
@@ -258,14 +259,14 @@ class PhotoView extends StatefulWidget {
     this.scaleStateCycle,
     this.onTapUp,
     this.onTapDown,
-    this.url,
+    this.lynouFile,
     this.videoPath,
   })  : loadingChild = null,
         imageProvider = null,
         gaplessPlayback = false,
         super(key: key);
 
-  final String url;
+  final LYFile lynouFile;
   final String videoPath;
 
   /// Given a [imageProvider] it resolves into an zoomable image widget using. It
@@ -389,7 +390,7 @@ class _PhotoViewState extends State<PhotoView>
   void initState() {
     super.initState();
     if (widget.child == null) {
-      if( widget.url == null && widget.videoPath == null) {
+      if( widget.lynouFile == null && widget.videoPath == null) {
         _getImage();
       } else {
         _childSize = Size(100, 200);
@@ -535,7 +536,7 @@ class _PhotoViewState extends State<PhotoView>
   Widget _buildWrapperImage(BuildContext context) {
     return PhotoViewImageWrapper(
       imageProvider: widget.imageProvider,
-      url: widget.url,
+      lynouFile: widget.lynouFile,
       videoPath: widget.videoPath,
       backgroundDecoration: widget.backgroundDecoration,
       gaplessPlayback: widget.gaplessPlayback,

@@ -136,12 +136,12 @@ class _AssetPickerState extends State<AssetPicker> {
                 Consumer<MultiSelectorModel>(
                   builder: (context, selector, child) {
                     return ConstrainedBox(
-                      constraints: BoxConstraints(maxWidth: 70),
+                      constraints: BoxConstraints(maxWidth: 100),
                       child: FlatButton(
                         textColor: _themeProvider.firstColor,
                         onPressed: () => widget.onDone(_selector.selectedItems),
                         child: Text(
-                          "(${selector.selectedItems.length})",
+                          "${widget.appTranslations.text("ok")} (${selector.selectedItems.length})",
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),

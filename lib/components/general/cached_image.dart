@@ -11,12 +11,16 @@ class CachedImage extends StatefulWidget {
   final BoxFit boxFit;
   final double height;
   final double width;
+  final double heightPlaceholder;
+  final double widthPlaceholder;
 
   CachedImage({
     @required this.url,
     this.boxFit,
     this.height,
     this.width,
+    this.heightPlaceholder,
+    this.widthPlaceholder,
   });
 
   @override
@@ -30,10 +34,22 @@ class _CachedImageState extends State<CachedImage> {
   Widget _displaysPlaceholder(BuildContext context) {
     var themeProvider = Provider.of<ThemeProvider>(context, listen: true);
 
+    var width;
+    var height;
+
+    // Put the placeholder size
+    if(widget.widthPlaceholder != null) {
+      width = widget.widthPlaceholder;
+    }
+
+    if(widget.heightPlaceholder != null) {
+      height = widget.heightPlaceholder;
+    }
+
     return Container(
       color: themeProvider.secondBackgroundColor,
-      width: widget.width != null ? widget.width : null,
-      height: widget.height != null ? widget.height : null,
+      width: width,
+      height: height,
     );
   }
 

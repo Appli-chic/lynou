@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:lynou/models/database/file.dart';
 import 'package:lynou/screens/utils/viewer/photo_view.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_controller.dart';
 import 'package:lynou/screens/utils/viewer/src/photo_view_image_wrapper.dart';
@@ -241,7 +242,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
         : PhotoView(
             key: ObjectKey(index),
             imageProvider: pageOption.imageProvider,
-            url: pageOption.url,
+            lynouFile: pageOption.lynouFile,
             videoPath: pageOption.videoPath,
             loadingChild: widget.loadingChild,
             backgroundDecoration: widget.backgroundDecoration,
@@ -282,7 +283,7 @@ class _PhotoViewGalleryState extends State<PhotoViewGallery> {
 class PhotoViewGalleryPageOptions {
   PhotoViewGalleryPageOptions(
       {Key key,
-      this.url,
+      this.lynouFile,
       this.videoPath,
       this.imageProvider,
       this.heroTag,
@@ -311,13 +312,13 @@ class PhotoViewGalleryPageOptions {
     this.scaleStateCycle,
     this.onTapUp,
     this.onTapDown,
-    this.url,
+    this.lynouFile,
     this.videoPath,
   })  : imageProvider = null,
         assert(child != null),
         assert(childSize != null);
 
-  final String url;
+  final LYFile lynouFile;
   final String videoPath;
 
   /// Mirror to [PhotoView.imageProvider]

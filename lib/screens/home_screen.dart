@@ -57,12 +57,6 @@ class _HomeScreenState extends State<HomeScreen>
       setState(() {
         _postList = postList;
       });
-//      _userService.fetchWallPosts(Source.server).then((posts) {
-//        _postList.clear();
-//        _postList = posts;
-//
-//        setState(() {});
-//      });
     }
   }
 

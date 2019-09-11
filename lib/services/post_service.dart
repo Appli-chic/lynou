@@ -37,10 +37,10 @@ class PostService {
     // Upload all the files
     for (var file in files) {
       if (file.type == MediaType.IMAGE) {
-        await _storageService.uploadFile(file, false);
+        file.path = await _storageService.uploadFile(file, false);
       } else if (file.type == MediaType.VIDEO) {
-        await _storageService.uploadFile(file, false);
-        await _storageService.uploadFile(file, true);
+        file.path = await _storageService.uploadFile(file, false);
+        file.thumbnailPath = await _storageService.uploadFile(file, true);
       }
 
       // Create files written json

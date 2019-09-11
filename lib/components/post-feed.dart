@@ -6,11 +6,11 @@ import 'package:lynou/components/general/avatar.dart';
 import 'package:lynou/components/general/cached_image.dart';
 import 'package:lynou/components/general/chip.dart';
 import 'package:lynou/localization/app_translations.dart';
+import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/utils/viewer/viewer.dart';
 import 'package:lynou/services/storage_service.dart';
-import 'package:lynou/utils/image.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -41,10 +41,15 @@ class _PostFeedState extends State<PostFeed>
   Widget _displaysMedia() {
     // Displays only one media
     if (widget.post.fileList != null && widget.post.fileList.length == 1) {
-      var urlList = List<String>();
-      var url =
-          _storageService.getFileDownloadUrl(widget.post.fileList[0].name);
-      urlList.add(url);
+      var file = widget.post.fileList[0];
+
+      String url;
+      if (file.type == TYPE_VIDEO) {
+        url = _storageService.getFileDownloadUrl(file.thumbnail);
+      } else {
+        url = _storageService.getFileDownloadUrl(file.name);
+      }
+
 
       return GestureDetector(
         onTap: () async {
@@ -52,7 +57,7 @@ class _PostFeedState extends State<PostFeed>
             context,
             MaterialPageRoute(
               builder: (context) => Viewer(
-                urlList: urlList,
+                lynouFiles: widget.post.fileList,
                 index: 0,
               ),
             ),
@@ -65,20 +70,22 @@ class _PostFeedState extends State<PostFeed>
               margin: EdgeInsets.only(top: 8),
               child: CachedImage(
                 url: url,
+                heightPlaceholder: 200,
+                width: double.infinity,
               ),
             ),
-//            ImageUtils.checkIfIsVideo(url)
-//                ? Container(
-//                    margin: EdgeInsets.only(top: 8),
-//                    child: Center(
-//                      child: Icon(
-//                        Icons.play_circle_filled,
-//                        color: Colors.white,
-//                        size: 40,
-//                      ),
-//                    ),
-//                  )
-//                : Container(),
+            widget.post.fileList[0].type == TYPE_VIDEO
+                ? Container(
+                    margin: EdgeInsets.only(top: 8),
+                    child: Center(
+                      child: Icon(
+                        Icons.play_circle_filled,
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    ),
+                  )
+                : Container(),
           ],
         ),
       );
@@ -86,12 +93,6 @@ class _PostFeedState extends State<PostFeed>
         widget.post.fileList.length > 1) {
       // Displays more than one media
       List<Widget> listAssets = [];
-      var urlList = List<String>();
-
-      for (var file in widget.post.fileList) {
-        var url = _storageService.getFileDownloadUrl(file.name);
-        urlList.add(url);
-      }
 
       int crossAxisCount = 4;
       if (widget.post.fileList.length < 4) {
@@ -103,10 +104,7 @@ class _PostFeedState extends State<PostFeed>
 
         if (index < 4) {
           listAssets.add(
-            _displayAssetForGrid(
-                _storageService.getFileDownloadUrl(file.name),
-                index,
-                urlList),
+            _displayAssetForGrid(index, file),
           );
         }
       }
@@ -130,14 +128,22 @@ class _PostFeedState extends State<PostFeed>
 
   /// Displays photos and videos for the grid in case of a post with many
   /// images or videos.
-  Widget _displayAssetForGrid(String url, int index, List<String> urlList) {
+  Widget _displayAssetForGrid(int index, LYFile file) {
+    String url;
+
+    if (file.type == TYPE_VIDEO) {
+      url = _storageService.getFileDownloadUrl(file.thumbnail);
+    } else {
+      url = _storageService.getFileDownloadUrl(file.name);
+    }
+
     return GestureDetector(
       onTap: () async {
         await Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => Viewer(
-              urlList: urlList,
+              lynouFiles: widget.post.fileList,
               index: index,
             ),
           ),
@@ -150,30 +156,32 @@ class _PostFeedState extends State<PostFeed>
             boxFit: BoxFit.cover,
             height: double.infinity,
             width: double.infinity,
+            heightPlaceholder: double.infinity,
+            widthPlaceholder: double.infinity,
           ),
-//          ImageUtils.checkIfIsVideo(url)
-//              ? Center(
-//                  child: Icon(
-//                    Icons.play_circle_filled,
-//                    color: Colors.white,
-//                    size: 40,
-//                  ),
-//                )
-//              : Container(),
-//          index == 3 && listFirebaseUrl.length != 4
-//              ? Container(
-//                  color: Colors.black54,
-//                  child: Center(
-//                    child: Text(
-//                      '+${listFirebaseUrl.length - 4}',
-//                      style: TextStyle(
-//                        color: Colors.white,
-//                        fontSize: 20,
-//                      ),
-//                    ),
-//                  ),
-//                )
-//              : Container(),
+          file.type == TYPE_VIDEO
+              ? Center(
+                  child: Icon(
+                    Icons.play_circle_filled,
+                    color: Colors.white,
+                    size: 40,
+                  ),
+                )
+              : Container(),
+          index == 3 && widget.post.fileList.length != 4
+              ? Container(
+                  color: Colors.black54,
+                  child: Center(
+                    child: Text(
+                      '+${widget.post.fileList.length - 4}',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ),
+                )
+              : Container(),
         ],
       ),
     );
