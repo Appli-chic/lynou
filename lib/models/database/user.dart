@@ -33,4 +33,9 @@ class User {
     'created_at': createdAt,
     'updated_at': updatedAt,
   };
+
+  static String createTable() {
+    return 'CREATE TABLE User (id INTEGER PRIMARY KEY, email TEXT, name TEXT, '
+        'photo TEXT, userId INTEGER, createdAt DATETIME, updatedAt DATETIME)';
+  }
 }

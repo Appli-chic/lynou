@@ -3,6 +3,8 @@ import 'dart:collection';
 import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/user.dart';
 
+const TABLE_POST = "Post";
+
 class Post {
   int id;
   int userId;
@@ -28,7 +30,7 @@ class Post {
     if (jsonMap["Files"] != null) {
       List<dynamic> jsonFileList = jsonMap["Files"];
 
-      for(var jsonFile in jsonFileList) {
+      for (var jsonFile in jsonFileList) {
         LYFile file = LYFile.fromJson(jsonFile);
         fileList.add(file);
       }
@@ -52,4 +54,14 @@ class Post {
         'created_at': createdAt,
         'updated_at': updatedAt,
       };
+
+  String insertData() {
+    return 'INSERT INTO $TABLE_POST(id, text, createdAt, updatedAt) VALUES($id,"$text", '
+        '"${createdAt.toIso8601String()}", "${updatedAt.toIso8601String()}")';
+  }
+
+  static String createTable() {
+    return 'CREATE TABLE $TABLE_POST (id INTEGER PRIMARY KEY, text TEXT, userId INTEGER, '
+        'createdAt DATETIME, updatedAt DATETIME, FOREIGN KEY(userId) REFERENCES User(id))';
+  }
 }
