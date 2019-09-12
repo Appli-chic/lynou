@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:lynou/models/api_error.dart';
@@ -13,6 +12,7 @@ import 'package:mime_type/mime_type.dart';
 import 'package:uuid/uuid.dart';
 
 const String FILE_DOWNLOAD = "/api/file";
+const String FILE_DOWNLOAD_VIDEO = "/api/video";
 const String FILE_UPLOAD = "/api/file";
 
 class StorageService {
@@ -22,14 +22,11 @@ class StorageService {
     this.env,
   });
 
-  /// Download the video file to put it in the player
-  /// Downloaded thanks to the [name] and send back a file.
-  Future<File> downloadVideo(String name) async {
+  /// Retrieve the download url from the [name] of a video
+  Future<String> getFileVideoDownloadUrl(String name) async {
     final storage = FlutterSecureStorage();
     var accessToken = await storage.read(key: env.accessTokenKey);
-    return await DefaultCacheManager().getSingleFile(
-        "${env.apiUrl}$FILE_DOWNLOAD/$name",
-        headers: {HttpHeaders.authorizationHeader: "Bearer $accessToken"});
+    return "${env.apiUrl}$FILE_DOWNLOAD_VIDEO/$name?key=$accessToken";
   }
 
   /// Retrieve the download url from the [name] of a file

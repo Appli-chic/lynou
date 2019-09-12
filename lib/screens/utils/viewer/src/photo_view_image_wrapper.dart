@@ -250,8 +250,8 @@ class _PhotoViewImageWrapperState extends State<PhotoViewImageWrapper>
     if (widget.lynouFile != null && (_isVideoLoading && !_didVideoLoaded)) {
       if (widget.lynouFile.type == TYPE_VIDEO) {
         _isOverlayVisible = true;
-        var file = await _storageService.downloadVideo(widget.lynouFile.name);
-        _videoPlayerController = VideoPlayerController.file(file)
+        var videoUrl = await _storageService.getFileVideoDownloadUrl(widget.lynouFile.name);
+        _videoPlayerController = VideoPlayerController.network(videoUrl)
           ..initialize().then((_) {
             // Ensure the first frame is shown after the video is initialized, even before the play button has been pressed.
             setState(() {

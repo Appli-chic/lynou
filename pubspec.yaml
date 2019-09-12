@@ -34,7 +34,6 @@ dependencies:
   permission_handler: ^3.2.2
   mime_type: ^0.2.4
   cached_network_image: ^1.1.1
-  flutter_cache_manager: ^1.1.1
 #  flutter_video_compress: ^0.3.7+8
 
   flutter:

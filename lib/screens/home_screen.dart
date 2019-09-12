@@ -45,14 +45,7 @@ class _HomeScreenState extends State<HomeScreen>
         _isStartedOnce = true;
       });
 
-      // Get posts from cache
-//      List<Post> postsFromCache =
-//          await _userService.fetchWallPosts(Source.cache);
-//      setState(() {
-//        _postList = postsFromCache;
-//      });
-//
-//      // Get posts from the server
+      // Get posts from the server
       var postList = await _postService.fetchWallPosts(_page);
       _postList.clear();
       setState(() {
