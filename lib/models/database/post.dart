@@ -2,8 +2,7 @@ import 'dart:collection';
 
 import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/user.dart';
-
-const TABLE_POST = "Post";
+import 'package:lynou/providers/sqlite/post_provider.dart';
 
 class Post {
   int id;
@@ -47,21 +46,31 @@ class Post {
     );
   }
 
+  factory Post.fromSqlite(Map<String, dynamic> jsonMap) {
+    return Post(
+      id: jsonMap[COLUMN_ID],
+      userId: jsonMap[COLUMN_USER_ID],
+      text: jsonMap[COLUMN_TEXT],
+      createdAt: DateTime.parse(jsonMap[COLUMN_CREATED_AT]),
+      updatedAt: DateTime.parse(jsonMap[COLUMN_UPDATED_AT]),
+    );
+  }
+
+  Map<String, dynamic> toSqlite() {
+    var map = <String, dynamic>{
+      COLUMN_ID: id,
+      COLUMN_TEXT: text,
+      COLUMN_USER_ID: userId,
+      COLUMN_CREATED_AT: createdAt.toIso8601String(),
+      COLUMN_UPDATED_AT: updatedAt.toIso8601String(),
+    };
+
+    return map;
+  }
+
   Map<String, dynamic> toJson() => {
-        'user_id': userId,
+        'id': userId,
         'text': text,
         'fileList': fileList,
-        'created_at': createdAt,
-        'updated_at': updatedAt,
       };
-
-  String insertData() {
-    return 'INSERT INTO $TABLE_POST(id, text, createdAt, updatedAt) VALUES($id,"$text", '
-        '"${createdAt.toIso8601String()}", "${updatedAt.toIso8601String()}")';
-  }
-
-  static String createTable() {
-    return 'CREATE TABLE $TABLE_POST (id INTEGER PRIMARY KEY, text TEXT, userId INTEGER, '
-        'createdAt DATETIME, updatedAt DATETIME, FOREIGN KEY(userId) REFERENCES User(id))';
-  }
 }

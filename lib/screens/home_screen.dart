@@ -46,26 +46,30 @@ class _HomeScreenState extends State<HomeScreen>
       });
 
       // Get posts from the server
-      var postList = await _postService.fetchWallPosts(_page);
-      _postList.clear();
-      setState(() {
-        _postList = postList;
+      var stream = _postService.fetchWallPosts(_page);
+      stream.listen((postList) {
+        _postList.clear();
+        setState(() {
+          _postList = postList;
+        });
       });
     }
   }
 
   /// Refresh the posts when we pull the top of the screen
   Future<void> _refreshPosts() async {
-    var postList = await _postService.fetchWallPosts(0);
+    var stream = _postService.fetchWallPosts(0);
 
-    for(var post in postList.reversed) {
-      var doubledPostList = _postList.where((e) => e.id == post.id);
-      if(doubledPostList.isEmpty) {
-        _postList.insert(0, post);
+    stream.listen((postList) {
+      for (var post in postList.reversed) {
+        var doubledPostList = _postList.where((e) => e.id == post.id);
+        if (doubledPostList.isEmpty) {
+          _postList.insert(0, post);
+        }
       }
-    }
 
-    setState(() { });
+      setState(() {});
+    });
   }
 
   /// Load more posts when we arrive at the bottom of the page.
@@ -76,15 +80,22 @@ class _HomeScreenState extends State<HomeScreen>
         _page++;
       });
 
-      var postList = await _postService.fetchWallPosts(_page);
-      _postList.addAll(postList);
+      var stream = _postService.fetchWallPosts(_page);
+      stream.listen((postList) {
+        for (var post in postList) {
+          var doubledPostList = _postList.where((e) => e.id == post.id);
+          if (doubledPostList.isEmpty) {
+            _postList.add(post);
+          }
+        }
 
-      // Don't permit to load more if it is the end.
-      if (postList.isNotEmpty) {
-        setState(() {
-          _isLoadingMore = false;
-        });
-      }
+        // Don't permit to load more if it is the end.
+        if (postList.isNotEmpty) {
+          setState(() {
+            _isLoadingMore = false;
+          });
+        }
+      });
     }
   }
 

@@ -7,6 +7,9 @@ import 'package:lynou/models/api_error.dart';
 import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/post.dart';
 import 'package:lynou/models/env.dart';
+import 'package:lynou/providers/sqlite/file_provider.dart';
+import 'package:lynou/providers/sqlite/post_provider.dart';
+import 'package:lynou/providers/sqlite/user_provider.dart';
 import 'package:lynou/services/storage_service.dart';
 import 'package:lynou/utils/sqlite.dart';
 import 'package:media_picker_builder/data/media_file.dart';
@@ -73,7 +76,9 @@ class PostService {
 
   /// Fetch all the posts concerning the user and his friends
   /// The page number indicates how many posts the user retrieved already
-  Future<List<Post>> fetchWallPosts(int page) async {
+  Stream<List<Post>> fetchWallPosts(int page) async* {
+    yield await PostProvider.fetchWallPosts(); // Return the data from sqlite
+
     final storage = FlutterSecureStorage();
     var accessToken = await storage.read(key: env.accessTokenKey);
 
@@ -91,19 +96,16 @@ class PostService {
       }
 
       // Save data in sqlite
-      Sqlite sqlite = Sqlite();
-      await sqlite.open();
-
       for (var post in postList) {
-        await sqlite.insert(post.insertData());
+        await PostProvider.save(post);
+        await UserProvider.save(post.user);
+
+        for (var file in post.fileList) {
+          await FileProvider.save(file);
+        }
       }
 
-      var data = await sqlite.fetchData(TABLE_POST);
-      print(data);
-
-      await sqlite.close();
-
-      return postList;
+//      yield postList; // Return the data from the server
     } else {
       throw ApiError.fromJson(json.decode(response.body));
     }

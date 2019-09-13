@@ -1,3 +1,5 @@
+import 'package:lynou/providers/sqlite/file_provider.dart';
+
 const int TYPE_IMAGE = 0;
 const int TYPE_VIDEO = 1;
 
@@ -38,4 +40,30 @@ class LYFile {
     'name': name,
     'thumbnail': thumbnail,
   };
+
+  factory LYFile.fromSqlite(Map<String, dynamic> jsonMap) {
+    return LYFile(
+      id: jsonMap[COLUMN_ID],
+      name: jsonMap[COLUMN_NAME],
+      thumbnail: jsonMap[COLUMN_THUMBNAIL],
+      type: jsonMap[COLUMN_TYPE],
+      createdAt: DateTime.parse(jsonMap[COLUMN_CREATED_AT]),
+      updatedAt: DateTime.parse(jsonMap[COLUMN_UPDATED_AT]),
+      postId: jsonMap[COLUMN_POST_ID],
+    );
+  }
+
+  Map<String, dynamic> toSqlite() {
+    var map = <String, dynamic>{
+      COLUMN_ID: id,
+      COLUMN_NAME: name,
+      COLUMN_THUMBNAIL: thumbnail,
+      COLUMN_TYPE: type,
+      COLUMN_CREATED_AT: createdAt.toIso8601String(),
+      COLUMN_UPDATED_AT: updatedAt.toIso8601String(),
+      COLUMN_POST_ID: postId,
+    };
+
+    return map;
+  }
 }

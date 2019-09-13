@@ -1,21 +1,31 @@
-import 'package:lynou/models/database/post.dart';
-import 'package:lynou/models/database/user.dart';
+import 'dart:io';
+
+import 'package:lynou/providers/sqlite/file_provider.dart';
+import 'package:lynou/providers/sqlite/post_provider.dart';
+import 'package:lynou/providers/sqlite/user_provider.dart';
 import 'package:path/path.dart';
 import 'package:sqflite/sqflite.dart';
 
 class Sqlite {
   Database db;
 
+  deleteDatabase() async {
+    var databasesPath = await getDatabasesPath();
+    String path = join(databasesPath, 'local.db');
+    var file = File(path);
+    file.delete();
+  }
+
   /// Open and create the database with the structure
   open() async {
     var databasesPath = await getDatabasesPath();
     String path = join(databasesPath, 'local.db');
-
     db = await openDatabase(path, version: 1,
         onCreate: (Database db, int version) async {
       // Create the tables
-      await db.execute(User.createTable());
-      await db.execute(Post.createTable());
+      await db.execute(FileProvider.createTable());
+      await db.execute(UserProvider.createTable());
+      await db.execute(PostProvider.createTable());
     });
   }
 
@@ -25,16 +35,30 @@ class Sqlite {
   }
 
   /// Insert data in the local database
-  insert(String data) async {
-    await db.transaction((txn) async {
-      try {
-        await txn.rawInsert(data);
-      } catch (e) {}
-    });
+  insert(String tableName, Map<String, dynamic> values) async {
+    return await db.insert(tableName, values);
+  }
+
+  /// Update the specific row
+  update(
+    String tableName,
+    Map<String, dynamic> values, {
+    String where,
+    List<dynamic> whereArgs,
+  }) async {
+    return await db.update(tableName, values,
+        where: where, whereArgs: whereArgs);
   }
 
   /// Fetch all rows in a table
-  Future<List<Map<String, dynamic>>> fetchData(String tableName) async {
-    return await db.query(tableName);
+  Future<List<Map<String, dynamic>>> fetchData(
+    String tableName, {
+    String where,
+    List<dynamic> whereArgs,
+    String orderBy,
+    int limit,
+  }) async {
+    return await db.query(tableName,
+        where: where, whereArgs: whereArgs, orderBy: orderBy, limit: limit);
   }
 }
