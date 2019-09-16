@@ -46,12 +46,14 @@ class _LYAvatarState extends State<LYAvatar> {
       });
 
       var accessToken = await _authService.getAccessToken();
-      var photoUrl = await _userService.getProfilePhotoUrl();
+      var photoStream = _userService.getProfilePhotoUrl();
 
-      setState(() {
-        _isLoaded = true;
-        _accessToken = accessToken;
-        _photoUrl = photoUrl;
+      photoStream.listen((photoUrl) {
+        setState(() {
+          _isLoaded = true;
+          _accessToken = accessToken;
+          _photoUrl = photoUrl;
+        });
       });
     }
   }

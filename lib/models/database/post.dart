@@ -1,5 +1,3 @@
-import 'dart:collection';
-
 import 'package:lynou/models/database/file.dart';
 import 'package:lynou/models/database/user.dart';
 import 'package:lynou/providers/sqlite/post_provider.dart';

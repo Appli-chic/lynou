@@ -6,7 +6,6 @@ import 'package:lynou/models/database/post.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/new_post_page.dart';
 import 'package:lynou/services/post_service.dart';
-import 'package:lynou/services/user_service.dart';
 import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {

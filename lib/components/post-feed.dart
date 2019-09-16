@@ -1,6 +1,3 @@
-import 'dart:io';
-
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:lynou/components/general/avatar.dart';
 import 'package:lynou/components/general/cached_image.dart';

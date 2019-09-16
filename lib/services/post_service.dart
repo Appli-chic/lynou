@@ -11,7 +11,6 @@ import 'package:lynou/providers/sqlite/file_provider.dart';
 import 'package:lynou/providers/sqlite/post_provider.dart';
 import 'package:lynou/providers/sqlite/user_provider.dart';
 import 'package:lynou/services/storage_service.dart';
-import 'package:lynou/utils/sqlite.dart';
 import 'package:media_picker_builder/data/media_file.dart';
 import 'package:path/path.dart' as path;
 
@@ -68,7 +67,17 @@ class PostService {
 
     if (response.statusCode == 200) {
       // Retrieve the post
-      return Post.fromJson(json.decode(response.body)["post"]);
+      var newPost =  Post.fromJson(json.decode(response.body)["post"]);
+
+      // Save the information in the sqlite database
+      await PostProvider.save(newPost);
+      await UserProvider.save(newPost.user);
+
+      for (var file in newPost.fileList) {
+        await FileProvider.save(file);
+      }
+
+      return newPost;
     } else {
       throw ApiError.fromJson(json.decode(response.body));
     }
