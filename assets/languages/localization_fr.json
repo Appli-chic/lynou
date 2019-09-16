@@ -29,5 +29,7 @@
   "error_dialog": "Erreur",
   "ok": "OK",
   "cancel": "Annuler",
-  "asset_picker_no_folders": "Aucun dossier de photos trouvé"
+  "asset_picker_no_folders": "Aucun dossier de photos trouvé",
+  "search_title": "Recherche",
+  "search_hint": "Recherchez..."
 }

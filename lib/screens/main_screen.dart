@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:lynou/components/general/icon.dart';
 import 'package:lynou/providers/theme_provider.dart';
 import 'package:lynou/screens/chat_screen.dart';
+import 'package:lynou/screens/find_screen.dart';
 import 'package:lynou/screens/home_screen.dart';
 import 'package:provider/provider.dart';
 
@@ -79,8 +80,7 @@ class _MainScreenState extends State<MainScreen> {
         children: <Widget>[
           HomeScreen(),
           ChatScreen(),
-          ChatScreen(),
-          ChatScreen(),
+          FindScreen(),
           ChatScreen(),
         ],
       ),

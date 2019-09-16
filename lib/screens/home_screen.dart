@@ -98,6 +98,42 @@ class _HomeScreenState extends State<HomeScreen>
     }
   }
 
+  /// Displays the body containing the post list
+  Widget _displaysBody() {
+    return NotificationListener(
+      onNotification: (ScrollNotification scrollInfo) {
+        if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
+          _loadMore();
+        }
+
+        return true;
+      },
+      child: RefreshIndicator(
+        onRefresh: _refreshPosts,
+        child: Container(
+          color: _themeProvider.backgroundColor,
+          child: ListView.separated(
+            addAutomaticKeepAlives: true,
+            itemCount: _postList.length,
+            itemBuilder: (context, index) {
+              return Container(
+                margin: EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
+                child: PostFeed(post: _postList[index]),
+              );
+            },
+            separatorBuilder: (context, index) {
+              return Divider(
+                color: _themeProvider.textColor,
+                indent: 16,
+                endIndent: 16,
+              );
+            },
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     super.build(context);
@@ -116,39 +152,7 @@ class _HomeScreenState extends State<HomeScreen>
         brightness: _themeProvider.setBrightness(),
         centerTitle: true,
       ),
-      body: NotificationListener(
-        onNotification: (ScrollNotification scrollInfo) {
-          if (scrollInfo.metrics.pixels == scrollInfo.metrics.maxScrollExtent) {
-            _loadMore();
-          }
-
-          return true;
-        },
-        child: RefreshIndicator(
-          onRefresh: _refreshPosts,
-          child: Container(
-            color: _themeProvider.backgroundColor,
-            child: ListView.separated(
-              addAutomaticKeepAlives: true,
-              itemCount: _postList.length,
-              itemBuilder: (context, index) {
-                return Container(
-                  margin:
-                      EdgeInsets.only(left: 16, right: 16, bottom: 8, top: 8),
-                  child: PostFeed(post: _postList[index]),
-                );
-              },
-              separatorBuilder: (context, index) {
-                return Divider(
-                  color: _themeProvider.textColor,
-                  indent: 16,
-                  endIndent: 16,
-                );
-              },
-            ),
-          ),
-        ),
-      ),
+      body: _displaysBody(),
       floatingActionButton: LYFloatingActionButton(
         theme: _themeProvider.theme,
         iconData: Icons.add,

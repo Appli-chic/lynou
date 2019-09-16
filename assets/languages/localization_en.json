@@ -29,5 +29,7 @@
   "error_dialog": "Error",
   "ok": "OK",
   "cancel": "Cancel",
-  "asset_picker_no_folders": "You have no folders to select from"
+  "asset_picker_no_folders": "You have no folders to select from",
+  "search_title": "Search",
+  "search_hint": "Search..."
 }
