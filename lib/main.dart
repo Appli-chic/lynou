@@ -14,6 +14,7 @@ import 'package:lynou/services/auth_service.dart';
 import 'package:lynou/services/post_service.dart';
 import 'package:lynou/services/storage_service.dart';
 import 'package:lynou/services/user_service.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:timeago/timeago.dart' as timeago;
 
@@ -24,6 +25,16 @@ void main() async {
   // Config locales for timeago
   timeago.setLocaleMessages('fr', timeago.FrMessages());
   timeago.setLocaleMessages('fr_short', FrShortMessages());
+
+  // Set up the mobile push
+  OneSignal.shared.init(
+      "7697b3a4-a33a-49c3-bb14-4cdda502419d",
+      iOSSettings: {
+        OSiOSSettings.autoPrompt: false,
+        OSiOSSettings.inAppLaunchUrl: true
+      }
+  );
+  OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
 
   runApp(App());
 }
